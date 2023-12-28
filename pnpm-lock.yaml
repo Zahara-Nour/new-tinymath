@@ -156,6 +156,9 @@ importers:
       three:
         specifier: ^0.160.0
         version: 0.160.0
+      xstate:
+        specifier: ^5.4.1
+        version: 5.4.1
     devDependencies:
       '@playwright/test':
         specifier: ^1.40.1
@@ -9398,6 +9401,10 @@ packages:
         optional: true
       utf-8-validate:
         optional: true
+    dev: false
+
+  /xstate@5.4.1:
+    resolution: {integrity: sha512-1DDT047hsTCSgm3BwLyb4sXQDmTdbLutc4ni0MLACgd2yX6vij35pnNNf1F4U6kQ8njx6NxQ6wpLjlh1lqs0NQ==}
     dev: false
 
   /y18n@5.0.8:

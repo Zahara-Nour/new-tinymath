@@ -1,9 +1,10 @@
 <script lang="ts">
-	import { toastStore } from '@skeletonlabs/skeleton'
+	import { getToastStore } from '@skeletonlabs/skeleton'
 	import { Pulse } from 'svelte-loading-spinners'
 
 	export let form
 
+	const toastStore = getToastStore()
 	let pending = false
 
 	if (form?.error) {
@@ -23,7 +24,7 @@
 
 <div class="mt-16 flex flex-col items-center justify-center">
 	<h1 class="mb-4">Mot de passe oublié</h1>
-	<div class="p-4 card w-96 max-w-full">
+	<div class="card w-96 max-w-full p-4">
 		<form name="myform" action="?/recovery" method="POST">
 			<label class="label" for=""> Email </label>
 			<input class="input" type="text" name="email" />
@@ -35,7 +36,7 @@
 					}}
 					disabled={pending}
 					type="submit"
-					class="mt-4 btn variant-filled-primary">Valider</button
+					class="btn variant-filled-primary mt-4">Valider</button
 				>
 			</div>
 		</form>

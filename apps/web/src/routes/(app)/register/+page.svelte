@@ -1,11 +1,12 @@
 <script lang="ts">
-	import { Toast, toastStore } from '@skeletonlabs/skeleton'
+	import { Toast, getToastStore } from '@skeletonlabs/skeleton'
 	import { Pulse } from 'svelte-loading-spinners'
 	import type { ActionData, PageData } from './$types'
 
 	export let form: ActionData
 	export let data: PageData
 
+	const toastStore = getToastStore()
 	let pending = false
 
 	if (form?.error) {
@@ -28,11 +29,11 @@
 <h1>Inscription</h1>
 {#if !data.session?.user}
 	<div class="mt-16 flex flex-col items-center justify-center">
-		<div class="p-4 card w-96 max-w-full">
+		<div class="card w-96 max-w-full p-4">
 			<form name="myform" action="?/register" method="POST" class="auth-form">
 				<label class="label" for=""> Email </label>
 				<input class="input" type="text" name="email" />
-				<label class="mt-4  label" for=""> Password </label>
+				<label class="label mt-4" for=""> Password </label>
 				<input class="input" type="password" name="password" />
 				<div class="flex justify-center">
 					<button
@@ -41,7 +42,7 @@
 							pending = true
 							document.myform.submit()
 						}}
-						class="mt-4 btn variant-filled-primary"
+						class="btn variant-filled-primary mt-4"
 						>{#if pending}pending{:else}Register{/if}</button
 					>
 				</div>
