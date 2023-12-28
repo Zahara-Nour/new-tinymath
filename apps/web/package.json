@@ -47,6 +47,7 @@
 		"@playwright/test": "^1.40.1",
 		"@repo/eslint-config": "workspace:*",
 		"@sveltejs/adapter-auto": "^3.0.1",
+		"@sveltejs/adapter-vercel": "^4.0.3",
 		"@sveltejs/kit": "^2.0.4",
 		"@sveltejs/vite-plugin-svelte": "^3.0.1",
 		"@types/luxon": "^3.3.7",
