@@ -135,6 +135,7 @@ type Check = {
 	text: string
 	function: (item: CorrectedQuestion) => number[]
 }
+
 function checkConstraints(item: CorrectedQuestion) {
 	const checks: Check[] = [
 		{
@@ -541,7 +542,18 @@ function checkZeros(item: CorrectedQuestion) {
 }
 
 function checkForm(item: CorrectedQuestion) {
-	if (!item.testAnswers.length && item.solutions.length) {
+	if (item.formats) {
+		// we deal the case where there is only one answer
+		console.log('formats', item.formats)
+		const matchFormat = item.formats.some((format) =>
+			math(item.answers[0]).matchTemplate(math(format)),
+		)
+		if (!matchFormat) {
+			item.statuss[0] = STATUS_BAD_FORM
+			item.coms.push(item.answers.length === 1 ? BAD_FORM : BAD_FORM_MULTIPLE_ANSWERS)
+		}
+		console.log('mathFormat', matchFormat)
+	} else if (!item.testAnswers.length && item.solutions.length) {
 		if (item.options.includes('one-single-form-solution')) {
 			item.answers.forEach((answer, i) => {
 				if (item.statuss[i] !== STATUS_EMPTY && item.statuss[i] !== STATUS_INCORRECT) {

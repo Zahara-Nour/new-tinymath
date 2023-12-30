@@ -12,20 +12,9 @@ import {
 	PREMIERE_SPE_MATHS,
 	TERMINALE_SPE_MATHS,
 } from '$lib/grades.js'
-import {
-	color1,
-	color2,
-	color3,
-	correct_color,
-	incorrect_color,
-} from '$lib/stores'
+import { color1, color2, color3, correct_color, incorrect_color } from '$lib/stores'
 import { objectMap } from '../utils'
-import type {
-	Ids,
-	QuestionBase,
-	Questions,
-	QuestionWithID,
-} from '../../types/type'
+import type { Ids, QuestionBase, Questions, QuestionWithID } from '../../types/type'
 import { get } from 'svelte/store'
 
 // Les questions doivent-être structurées afin de pouvoir générer des fiches d'exercices
@@ -4514,7 +4503,7 @@ const questions: Questions = {
 						['3*27', '9*9'],
 					],
 					options: ['solutions-order-not-important'],
-					formats: ['$e[2;9]*$e[2;9]'],
+					formats: ['$e[2;99]*$e[2;99]'],
 					defaultDelay: 20,
 					grade: CM1,
 				},
@@ -22423,32 +22412,31 @@ const questions: Questions = {
 // 	id: '',
 // }
 export const questions_ids: Ids = {}
-const questionsWithID: Record<
-	string,
-	Record<string, Record<string, QuestionWithID[]>>
-> = objectMap(questions, (theme, theme_name, i) =>
-	objectMap(theme, (domain, domain_name, j) =>
-		objectMap(
-			domain,
-			(subdomain, subdomain_name, k) => {
-				const new_subdomain = subdomain.map((q, l) => {
-					const id = code[i!] + code[j!] + code[k!] + code[l]
-					questions_ids[id] = {
-						theme: theme_name,
-						domain: domain_name,
-						subdomain: subdomain_name,
-						level: l + 1,
-					}
-					return {
-						...q,
-						id,
-					} as QuestionWithID
-				})
-				return new_subdomain
-			},
-			// defaultQuestionsWithID,
+const questionsWithID: Record<string, Record<string, Record<string, QuestionWithID[]>>> = objectMap(
+	questions,
+	(theme, theme_name, i) =>
+		objectMap(theme, (domain, domain_name, j) =>
+			objectMap(
+				domain,
+				(subdomain, subdomain_name, k) => {
+					const new_subdomain = subdomain.map((q, l) => {
+						const id = code[i!] + code[j!] + code[k!] + code[l]
+						questions_ids[id] = {
+							theme: theme_name,
+							domain: domain_name,
+							subdomain: subdomain_name,
+							level: l + 1,
+						}
+						return {
+							...q,
+							id,
+						} as QuestionWithID
+					})
+					return new_subdomain
+				},
+				// defaultQuestionsWithID,
+			),
 		),
-	),
 )
 
 export function getQuestion(
@@ -22459,9 +22447,7 @@ export function getQuestion(
 ): QuestionWithID {
 	// on retourne une copie car on doit modifier les questions à la volée
 	const qs = questionsWithID[theme][domain][subdomain]
-	const q = qs.find(
-		(q) => questionsWithID[theme][domain][subdomain].indexOf(q) + 1 === level,
-	)
+	const q = qs.find((q) => questionsWithID[theme][domain][subdomain].indexOf(q) + 1 === level)
 	if (q) {
 		return { ...q }
 	} else {
