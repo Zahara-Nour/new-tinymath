@@ -20,8 +20,6 @@
 		"@neoconfetti/svelte": "^2.2.0",
 		"@repo/tinycas": "workspace:*",
 		"@repo/tinymathlive": "workspace:*",
-		"@repo/ui": "workspace:*",
-		"@repo/uiskeleton": "workspace:*",
 		"@skeletonlabs/skeleton": "^2.6.1",
 		"@skeletonlabs/tw-plugin": "^0.3.0",
 		"@supabase/auth-helpers-sveltekit": "^0.10.7",

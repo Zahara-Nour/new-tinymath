@@ -545,12 +545,12 @@ function checkForm(item: CorrectedQuestion) {
 		if (item.options.includes('one-single-form-solution')) {
 			item.answers.forEach((answer, i) => {
 				if (item.statuss[i] !== STATUS_EMPTY && item.statuss[i] !== STATUS_INCORRECT) {
-					let e = math(answer)
+					const e = math(answer)
 					const indexSolution = item.options.includes('solutions-order-not-important')
 						? item.solutionsIndexs[i]
 						: i
 
-					let solution = math(item.solutions[indexSolution])
+					const solution = math(item.solutions[indexSolution])
 					// trouver une solution pour les unités
 					if (!e.unit && !e.strictlyEquals(solution)) {
 						item.statuss[i] = STATUS_BAD_FORM
@@ -596,6 +596,8 @@ function checkForm(item: CorrectedQuestion) {
 						.sortTermsAndFactors()
 
 					// il faut trouver une autre solution quand il y a des unités
+					console.log('checkForm', e.string)
+					console.log('checkForm', solution.string)
 					if (!e.unit && !e.strictlyEquals(solution)) {
 						item.statuss[i] = STATUS_BAD_FORM
 						item.coms.push(item.answers.length === 1 ? BAD_FORM : BAD_FORM_MULTIPLE_ANSWERS)
@@ -610,6 +612,9 @@ function checkForm(item: CorrectedQuestion) {
 // on évalue la réponse de l'utilisateur en donnant un statut à chaque élément de la réponse,
 // ainsi qu'à la réponse globale
 export function assessItem(item: AnsweredQuestion) {
+	console.log('correction : ', item.answers)
+	console.log('correction : ', item.answers_latex)
+	console.log('correction : ', item.solutions)
 	// TODO: vérifier que les options sont intialisées à [] dans generateQuestion
 	const correctedItem: CorrectedQuestion = prepareCorrectedQuestion(item)
 	// essentiellement pour les tests
@@ -766,6 +771,7 @@ export function assessItem(item: AnsweredQuestion) {
 								} else {
 									correctedItem.solutionsUsed.push(index)
 									correctedItem.solutionsIndexs[i] = index
+									console.log('index solution', index)
 								}
 							} else if (!math(answer).equals(math(correctedItem.solutions[i]))) {
 								correctedItem.statuss[i] = STATUS_INCORRECT
@@ -783,10 +789,12 @@ export function assessItem(item: AnsweredQuestion) {
 					checkConstraints(correctedItem)
 					checkTermsAndFactors(correctedItem)
 					// TODO : tester les formats
+					console.log('status', correctedItem.status)
 					checkForm(correctedItem)
 
 					if (correctedItem.statuss.some((status) => status === STATUS_BAD_FORM)) {
 						correctedItem.status = STATUS_BAD_FORM
+						console.log('status', correctedItem.status)
 					} else if (
 						correctedItem.statuss.some((status) => status === STATUS_UNOPTIMAL_FORM) ||
 						(correctedItem.statuss.filter((status) => status === STATUS_EMPTY).length > 0 &&

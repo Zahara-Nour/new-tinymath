@@ -1,6 +1,7 @@
 <script lang="ts">
 	import QuestionCard from '$lib/ui/QuestionCard.svelte'
 	import type { Game } from './types'
+	import CorrectionGrid from './CorrectionGrid.svelte'
 	import games from './games'
 	import type { AnsweredQuestion, Timer } from '../../../../types/type'
 	import generateQuestion from '$lib/questions/generateQuestion'
@@ -13,6 +14,8 @@
 	import { page } from '$app/stores'
 	import PageHeader from '$lib/ui/PageHeader.svelte'
 	import { fullScreen } from '$lib/stores'
+	import Grid from '$lib/ui/icons/IconGrid.svelte'
+	import IconGrid from '$lib/ui/icons/IconGrid.svelte'
 
 	const toastStore = getToastStore()
 	let game: Game
@@ -26,6 +29,7 @@
 	let delay: number
 	let finish = false
 	let pause = false
+	let displayGrid = false
 
 	let question: AnsweredQuestion
 	let drawStackRef: HTMLDivElement
@@ -64,7 +68,7 @@
 			console.log('solutions', solutions)
 			availables = Array(game.length)
 				.fill(0)
-				.map((_, i) => i)
+				.map((_, i) => i + 1)
 			drawQuestion()
 		}
 	}
@@ -74,13 +78,14 @@
 	}
 
 	function togglePause() {
-		console.log('pause')
-		if (pause) {
-			timer.resume()
-		} else {
-			timer.pause()
+		if (!displayGrid) {
+			if (pause) {
+				timer.resume()
+			} else {
+				timer.pause()
+			}
+			pause = !pause
 		}
-		pause = !pause
 	}
 
 	function handleKeydown(ev: KeyboardEvent) {
@@ -105,8 +110,9 @@
 			const n = availables[Math.floor(Math.random() * availables.length)]
 			console.log('n', n)
 			availables.splice(availables.indexOf(n), 1)
-			console.log('availables', availables)
-			const q = game[n]
+			// force update
+			availables = availables
+			const q = game[n - 1]
 			console.log('q', q)
 			question = prepareAnsweredQuestion(generateQuestion({ ...q, id: '' }))
 			// delay = question.delay || question.defaultDelay || 10
@@ -137,21 +143,37 @@
 	<PageHeader title="Bingo mathématique" />
 {/if}
 {#if chosen}
-	<div class="overflow-y-hidden" style={'height:90vh'}>
+	<div class="overflow-y-hidden" style={$fullScreen ? 'height:90vh' : 'height:80vh'}>
 		<div class="flex h-full gap-8 overflow-y-hidden">
 			<div class="flex h-full grow items-center justify-center">
 				{#if finish}
 					Finish !
 				{:else}
-					<CircularProgress number={current + 1} {percentage} />
-					<QuestionCard class="max-w-xl text-3xl" card={question} />
+					<div class="flex flex-col items-center">
+						<CircularProgress number={current + 1} {percentage} />
+
+						<button
+							on:click={() => {
+								displayGrid = !displayGrid
+							}}
+							disabled={!pause}
+							class="btn-icon variant-filled-primary text-xl"><IconGrid /></button
+						>
+					</div>
+					{#if displayGrid}
+						<CorrectionGrid {availables} />
+					{:else}
+						<QuestionCard class="max-w-xl text-3xl" card={question} />
+					{/if}
 				{/if}
 			</div>
-			<div class="h-full max-h-full w-64 overflow-y-auto" bind:this={drawStackRef}>
-				{#each draws as draw}
-					<QuestionCard class="my-2 max-w-xl" card={draw} />
-				{/each}
-			</div>
+			{#if !displayGrid}
+				<div class="h-full max-h-full w-64 overflow-y-auto" bind:this={drawStackRef}>
+					{#each draws as draw}
+						<QuestionCard class="my-2 max-w-xl" card={draw} />
+					{/each}
+				</div>
+			{/if}
 		</div>
 	</div>
 {:else}

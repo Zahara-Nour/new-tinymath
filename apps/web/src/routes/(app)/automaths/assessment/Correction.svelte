@@ -114,9 +114,9 @@ z-index:100"
 				y={[0, 0.1]}
 				delay={[500, 2000]}
 				infinite
-				size="15"
-				duration="5000"
-				amount="300"
+				size={15}
+				duration={5000}
+				amount={300}
 				fallDistance="100vh"
 			/>
 		</div>
@@ -143,7 +143,10 @@ z-index:100"
 	{/if}
 
 	{#if !classroom}
-		<div class={'flex items-center justify-around  p-2'} style={`background:${colorResult}`}>
+		<div
+			class={'flex items-center justify-around  p-2 ' +
+				(percent >= 0.8 ? 'bg-success-500' : percent >= 0.5 ? 'bg-warning-400' : 'bg-error-400')}
+		>
 			<div class="flex h-full flex-col items-center justify-around">
 				<button on:click={() => (restart = true)} class="btn-icon my-2 bg-white text-2xl text-black"
 					><IconReload /></button

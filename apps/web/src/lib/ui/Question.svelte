@@ -1,5 +1,11 @@
 <script lang="ts">
-	import { toMarkup, formatLatexToHtml, prepareMathlive, virtualKeyboardMode } from '$lib/stores'
+	import {
+		toMarkup,
+		formatLatexToHtml,
+		prepareMathlive,
+		virtualKeyboardMode,
+		mathfieldElement,
+	} from '$lib/stores'
 	import { afterUpdate, onDestroy, onMount, tick } from 'svelte'
 	import { getLogger, formatToLatex, magnify_2xl } from '$lib/utils'
 	// import virtualKeyboard from '$lib/mathlive/virtualKeyboard'
@@ -280,7 +286,77 @@
 
 	function initMathField() {
 		if (!masked && mathField && !initialized) {
-			mathField.mathVirtualKeyboardPolicy = 'auto'
+			window.mathVirtualKeyboard.layouts = [
+				{
+					label: '',
+					rows: [
+						[
+							'[7]',
+							'[8]',
+							'[9]',
+							'[+]',
+							{ label: '[separator]', width: 0.5 },
+							'x',
+							'y',
+							{ label: '[separator]', width: 0.5 },
+							{ label: '[separator]', width: 2 },
+						],
+						[
+							'[4]',
+							'[5]',
+							'[6]',
+							'[-]',
+							{ label: '[separator]', width: 0.5 },
+							{ class: 'small', latex: '\\frac{#@}{#0}' },
+							'\\sqrt{#0}',
+							{ label: '[separator]', width: 0.5 },
+							{ label: '[backspace]', width: 2 },
+						],
+						[
+							'[1]',
+							'[2]',
+							'[3]',
+							'\\times',
+							{ label: '[separator]', width: 0.5 },
+							'#@^{2}',
+							'#@^{#?}',
+							{ label: '[separator]', width: 0.5 },
+							'[left]',
+							'[right]',
+						],
+						[
+							'[0]',
+							'[.]',
+							'\\pi',
+							'\\div',
+							{ label: '[separator]', width: 0.5 },
+							'[(]',
+							'[)]',
+							{ label: '[separator]', width: 0.5 },
+							{ label: '[return]', width: 2 },
+						],
+					],
+				},
+				{
+					label: '',
+					rows: [
+						['a', 'z', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', { label: '[backspace]', width: 1 }],
+						['q', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', '[left]', '[right]'],
+						[
+							{ label: '[separator]', width: 1 },
+							'w',
+							'x',
+							'c',
+							'v',
+							'b',
+							'n',
+							{ label: '[separator]', width: 1 },
+							{ label: '[return]', width: 2 },
+						],
+					],
+				},
+				'alphabetic',
+			]
 			mathField.mathModeSpace = '\\,'
 			mathField.addEventListener('keypress', onKeystroke)
 			mathField.addEventListener('input', onInput)
@@ -466,21 +542,21 @@
 		margin-top: 1em;
 		margin-bottom: 1em;
 		min-width: 2em;
-		color: black;
-		background: white;
+		color: inherit;
+		background: inherit;
 		font-size: 1.3em;
 		/* margin: 3em; */
 		padding: 4px;
 		border-radius: 4px;
 		/* border: 1px solid rgba(0, 0, 0, 0.3); */
 		/* box-shadow: 0 0 8px rgba(0, 0, 0, 0.2); */
-		--caret-color: red;
-		--selection-background-color: lightgoldenrodyellow;
+		--caret-color: rgb(241, 103, 103);
+		--selection-background-color: inherit;
+		--selection-background-color-focused: inherit;
 		--selection-color: darkblue;
-		/* --contains-highlight-backround-color: green; */
 		--placeholder-color: violet;
-		--contains-highlight-backround-color: white;
-		--text-highlight-background-color: white;
+		--contains-highlight-backround-color: red;
+		--text-highlight-background-color: inherit;
 	}
 	math-field:focus-within {
 		/* outline: 4px solid #d7170b; */
@@ -490,6 +566,10 @@
 	}
 
 	math-field::part(virtual-keyboard-toggle) {
+		display: none;
+	}
+
+	math-field::part(menu-toggle) {
 		display: none;
 	}
 

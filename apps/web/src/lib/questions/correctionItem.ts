@@ -279,7 +279,7 @@ export function createDetailedCorrection(item: CorrectedQuestion) {
 				html: `<img src='${img}' style="max-width:400px;max-height:40vh;" alt='toto'>`,
 			}
 		} else {
-			console.log('text', detail.text)
+			// console.log('text', detail.text)
 			line = {
 				text: detail.text
 					.replace(regexExpression2, () => replaceExpression2(item))
@@ -289,7 +289,7 @@ export function createDetailedCorrection(item: CorrectedQuestion) {
 					.replace(regexSolution, (_, p1) => replaceSolution(item, p1))
 					.replace(regexSol, (_, p1) => replaceSol(item, p1)),
 			}
-			console.log('line', line.text)
+			// console.log('line', line.text)
 		}
 		lines.push(line)
 	})
