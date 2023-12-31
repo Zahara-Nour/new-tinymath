@@ -19,6 +19,8 @@
 	import IconKeyboard from '$lib/ui/icons/IconKeyboard.svelte'
 	import IconHome from '$lib/ui/icons/IconHome.svelte'
 	import { getToastStore } from '@skeletonlabs/skeleton'
+	import PageHeader from '$lib/ui/PageHeader.svelte'
+	import IconNumberList from '$lib/ui/icons/IconNumberList.svelte'
 
 	export let data
 
@@ -46,6 +48,7 @@
 	let previous: number
 	let showExemple = false
 	let showCorrection = false
+	let showList = false
 	let alert = false
 	let cards: AnsweredQuestion[]
 	let card: AnsweredQuestion
@@ -311,7 +314,7 @@
 		</div>
 	{:else if finish}
 		{#if showCorrection}
-			<div style={classroom ? `font-size: ${magnifyClassroom};` : ''}>
+			<div style={classroom ? `font-size: 1.4em;` : ''}>
 				<Correction
 					items={cards.map(assessItem)}
 					{query}
@@ -322,13 +325,45 @@
 					{training}
 				/>
 			</div>
+		{:else if showList}
+			<div class="sticky top-2 z-50 flex justify-end">
+				<button
+					on:click={() => {
+						showList = !showList
+					}}
+					class="btn variant-filled-primary p-4 text-xl"
+					><IconNumberList />
+				</button>
+			</div>
+			<div class="flex w-4/5 flex-col items-center gap-4">
+				{#each cards as card, i}
+					<div class="flex w-full gap-4">
+						<span class="size-9 bg-primary-500 mt-4 rounded-md text-center text-2xl font-bold"
+							>{i + 1}</span
+						>
+
+						<QuestionCard
+							class={classroom ? 'max-w-3xl' : 'max-w-xl'}
+							{card}
+							interactive={false}
+							flashcard={flash}
+						/>
+					</div>
+				{/each}
+			</div>
 		{:else}
-			<div class="flex h-full items-center justify-center">
+			<div class="flex h-full flex-col items-center justify-center gap-4">
 				<button
 					on:click={() => {
 						showCorrection = true
 					}}
-					class="variant-filled-primary p-4 text-xl">Afficher la correction</button
+					class="btn variant-filled-primary p-4 text-xl">Afficher la correction</button
+				>
+				<button
+					on:click={() => {
+						showList = !showList
+					}}
+					class="btn variant-filled-primary p-4 text-xl"><IconNumberList /></button
 				>
 			</div>
 		{/if}
@@ -338,42 +373,43 @@
 				on:click={() => {
 					beginTest()
 				}}
-				class=" variant-filled-primary p-4 text-xl">Let's go !</button
-			>
+				class=" btn variant-filled-primary p-4 text-xl"
+				>Let's go !
+			</button>
 		</div>
 	{:else if courseAuxNombres}
-		Course aux nombres
-		{#if remaining}
-			{`${remaining.minutes}:${remaining.seconds < 10 ? '0' : ''}${remaining.seconds}`}
-		{/if}
-		<div class="flex justify-center">
-			<div id="cards-container" style={`width:600px`}>
-				{#each cards as card}
-					<div class="card">
-						<div class=" rounded-lg p-2">
-							<QuestionCard
-								{card}
-								interactive={true}
-								commit={(() => {
-									const c = { ...commit }
-									commits.push(c)
-									return c
-								})()}
-							/>
-						</div>
-					</div>
-				{/each}
+		<PageHeader title="Course aux nombres" />
+		<div class="container mx-auto px-2">
+			{#if remaining}
+				{`${remaining.minutes}:${remaining.seconds < 10 ? '0' : ''}${remaining.seconds}`}
+			{/if}
+			<div class="flex justify-center">
+				<div id="cards-container" style={`width:600px`}>
+					{#each cards as card}
+						<QuestionCard
+							class="my-2"
+							{card}
+							interactive={true}
+							commit={(() => {
+								const c = { ...commit }
+								commits.push(c)
+								return c
+							})()}
+						/>
+					{/each}
+				</div>
 			</div>
-		</div>
-		<div class="flex items-center justify-center">
-			<button
-				on:click={() => {
-					timer.stop()
-					commits.forEach((commit) => commit.exec())
-					finish = true
-				}}
-				class="variant-filled-primary">Valider</button
-			>
+			<div class="flex items-center justify-center">
+				<button
+					on:click={() => {
+						timer.stop()
+						commits.forEach((commit) => commit.exec())
+						finish = true
+					}}
+					class="variant-filled-primary"
+					>Valider
+				</button>
+			</div>
 		</div>
 	{:else if card}
 		<div style={classroom ? `font-size: ${magnifyClassroom};` : ''}>
@@ -457,7 +493,7 @@
 	}
 
 	#cards-container > * {
-		grid-row: 1;
-		grid-column: 1;
+		/* grid-row: 1; */
+		/* grid-column: 1; */
 	}
 </style>

@@ -6,6 +6,7 @@
 	import ubuRoi from '$lib/images/ubu-roi.jpg'
 	import ubu from '$lib/images/pere-ubu-head.jpg'
 	import { user } from '$lib/stores'
+	import PageHeader from '$lib/ui/PageHeader.svelte'
 
 	const toastStore = getToastStore()
 	let answer = ''
@@ -117,28 +118,28 @@
 	}
 </script>
 
-<div class="flex w-full flex-col items-center gap-12 px-8 pt-4">
-	<div>
-		<h1 class="h1">Père Ubu</h1>
-	</div>
-	<div>
-		<img src={ubuRoi} alt="Père Ubu" width="150px" class="float-left pb-2 pr-2" />
-		<p class="my-2">
-			Hé là, moi c'est Père Ubu, le roi des absurdes et le maître de la
-			<a href="http://college-de-pataphysique.fr/presentation/">'Pataphysique'</a> ! Je suis un personnage
-			fictif créé par le dramaturge français Alfred Jarry au XIXe siècle.
-		</p>
-		<p class="my-2">
-			Je suis connu pour mon comportement excentrique, mon langage étrange et ma nature
-			imprévisible. Mon cri de guerre est "Merdre !"
-		</p>
-		<p class="my-2">
-			Je peux essayer de t'aider en Maths, mais dès fois je dis d'<i>hénaurmes</i>
-			bêtises ! Il vaut alors mieux que tu demandes à M. Le Jolly, qui a toujours raison.
-		</p>
+<div class="container mx-auto px-4">
+	<PageHeader title="Père Ubu" />
+	<div class="flex gap-8">
+		<img src={ubuRoi} alt="Père Ubu" width="150px" />
+		<div>
+			<p class="my-2">
+				Hé là, moi c'est Père Ubu, le roi des absurdes et le maître de la
+				<a href="http://college-de-pataphysique.fr/presentation/">'Pataphysique'</a> ! Je suis un personnage
+				fictif créé par le dramaturge français Alfred Jarry au XIXe siècle.
+			</p>
+			<p class="my-2">
+				Je suis connu pour mon comportement excentrique, mon langage étrange et ma nature
+				imprévisible. Mon cri de guerre est "Merdre !"
+			</p>
+			<p class="my-2">
+				Je peux essayer de t'aider en Maths, mais dès fois je dis d'<i>hénaurmes</i>
+				bêtises ! Il vaut alors mieux que tu demandes à M. Le Jolly, qui a toujours raison.
+			</p>
+		</div>
 	</div>
 
-	<div class="grid h-full grid-rows-[1fr_auto] gap-1">
+	<div class="mt-12 grid h-full grid-rows-[1fr_auto] gap-1">
 		<div bind:this={elemChat} class="bg-surface-500/30 overflow-y-auto p-4">
 			<section class="max-h-[400px] w-full space-y-4 p-4">
 				{#each messageFeed as message, i}
