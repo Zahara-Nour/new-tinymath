@@ -138,55 +138,56 @@
 </script>
 
 <svelte:window on:keydown={handleKeydown} />
-
-{#if !$fullScreen}
-	<PageHeader title="Bingo mathématique" />
-{/if}
-{#if chosen}
-	<div class="overflow-y-hidden" style={$fullScreen ? 'height:90vh' : 'height:80vh'}>
-		<div class="flex h-full gap-8 overflow-y-hidden">
-			<div class="flex h-full grow items-center justify-center">
-				{#if finish}
-					Finish !
-				{:else}
-					<div class="flex flex-col items-center">
-						<CircularProgress number={current + 1} {percentage} />
-
-						<button
-							on:click={() => {
-								displayGrid = !displayGrid
-							}}
-							disabled={!pause}
-							class="btn-icon variant-filled-primary text-xl"><IconGrid /></button
-						>
-					</div>
-					{#if displayGrid}
-						<CorrectionGrid {availables} />
+<div class="container mx-auto px-4 pt-2">
+	{#if !$fullScreen}
+		<PageHeader title="Bingo mathématique" />
+	{/if}
+	{#if chosen}
+		<div class="overflow-y-hidden" style={$fullScreen ? 'height:90vh' : 'height:80vh'}>
+			<div class="flex h-full gap-8 overflow-y-hidden">
+				<div class="flex h-full grow items-center justify-center">
+					{#if finish}
+						Finish !
 					{:else}
-						<QuestionCard class="max-w-xl text-3xl" card={question} />
+						<div class="flex flex-col items-center">
+							<CircularProgress number={current + 1} {percentage} />
+
+							<button
+								on:click={() => {
+									displayGrid = !displayGrid
+								}}
+								disabled={!pause}
+								class="btn-icon variant-filled-primary text-xl"><IconGrid /></button
+							>
+						</div>
+						{#if displayGrid}
+							<CorrectionGrid {availables} />
+						{:else}
+							<QuestionCard class="max-w-xl text-3xl" card={question} />
+						{/if}
 					{/if}
+				</div>
+				{#if !displayGrid}
+					<div class="h-full max-h-full w-64 overflow-y-auto" bind:this={drawStackRef}>
+						{#each draws as draw}
+							<QuestionCard class="my-2 max-w-xl" card={draw} />
+						{/each}
+					</div>
 				{/if}
 			</div>
-			{#if !displayGrid}
-				<div class="h-full max-h-full w-64 overflow-y-auto" bind:this={drawStackRef}>
-					{#each draws as draw}
-						<QuestionCard class="my-2 max-w-xl" card={draw} />
-					{/each}
-				</div>
-			{/if}
 		</div>
-	</div>
-{:else}
-	<div
-		class="mt-12 flex flex-col items-center justify-center gap-16 text-3xl"
-		style="font-family: 'Baloo 2', sans-serif;"
-	>
-		{#each Object.entries(games) as [description, game] (description)}
-			<a
-				class="anchor"
-				style="text-decoration:none"
-				href="/jeux/bingo?game={encodeURI(JSON.stringify(description))}">{description}</a
-			>
-		{/each}
-	</div>
-{/if}
+	{:else}
+		<div
+			class="mt-12 flex flex-col items-center justify-center gap-16 text-3xl"
+			style="font-family: 'Baloo 2', sans-serif;"
+		>
+			{#each Object.entries(games) as [description, game] (description)}
+				<a
+					class="anchor"
+					style="text-decoration:none"
+					href="/jeux/bingo?game={encodeURI(JSON.stringify(description))}">{description}</a
+				>
+			{/each}
+		</div>
+	{/if}
+</div>

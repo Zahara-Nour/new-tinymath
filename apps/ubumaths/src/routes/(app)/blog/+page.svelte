@@ -5,9 +5,9 @@
 	export let data
 </script>
 
-{#if !$fullScreen}
-	<PageHeader title="Blog" />
-{/if}
 <div class="container mx-auto max-w-screen-md p-4">
+	{#if !$fullScreen}
+		<PageHeader title="Blog" />
+	{/if}
 	<Posts posts={data.posts} />
 </div>

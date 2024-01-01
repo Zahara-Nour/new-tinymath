@@ -4,12 +4,12 @@
 </script>
 
 <button
-	class={'btn h-20 w-20 size text-6xl flex items-center justify-center font-bold ' +
+	class={'btn size flex h-16 w-16 items-center justify-center text-5xl font-bold ' +
 		(status === 'selected'
 			? 'variant-filled-primary'
 			: status === 'selected-third'
-			? 'variant-filled-secondary'
-			: 'variant-filled-surface')}
+				? 'variant-filled-secondary'
+				: 'variant-filled-surface')}
 	style="font-family:'Baloo 2', sans-serif;"
 	on:click
 	disabled={status === 'not_available'}

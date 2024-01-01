@@ -334,12 +334,12 @@
 		<div class={tileClass}>
 			<div />
 			{#each grid as _, i}
-				<div class="btn size flex h-20 w-20 items-center justify-center text-4xl">
+				<div class="btn size flex h-16 w-16 items-center justify-center text-3xl">
 					{letters[i]}
 				</div>
 			{/each}
 			{#each grid as row, i}
-				<div class="btn size flex h-20 w-20 items-center justify-center text-4xl">
+				<div class="btn size flex h-16 w-16 items-center justify-center text-3xl">
 					{i + 1}
 				</div>
 				{#each row as cell, j}

@@ -37,7 +37,9 @@
 	// $: isStudent = isLoggedIn && $user.roles.includes('student')
 </script>
 
-<div class="bg-surface-50-900-token sticky top-0 flex flex-wrap py-3">
+<div
+	class="bg-surface-50-900-token border-tertiary-500 sticky top-0 flex flex-wrap border-b-2 pb-2"
+>
 	<div class="grow" />
 
 	<button on:click={toggleExemple} class={displayExemple ? classSelected : classNotSelected}

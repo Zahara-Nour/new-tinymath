@@ -21545,11 +21545,11 @@ const questions: Questions = {
 					subdescription: 'Fonctions usuelles avec coefficient.',
 					enounces: ['Calcule la dérivée de cette fonction.'],
 					enounces2: [
-						'$$f(x)=&2x$$',
-						'$$f(x)=&2x^2$$',
-						'$$f(x)=&2x^&1$$',
+						// '$$f(x)=&2x$$',
+						// '$$f(x)=&2x^2$$',
+						// '$$f(x)=&2x^&1$$',
 						'$$f(x)=&2/x$$',
-						'$$f(x)=&2sqrt(x)$$',
+						// '$$f(x)=&2sqrt(x)$$',
 					],
 					answerFields: ["$$f'(x)=...$$"],
 					variabless: [
@@ -21559,21 +21559,21 @@ const questions: Questions = {
 						},
 					],
 					solutionss: [
-						['&2'],
-						['[_&2*2_]x'],
-						['[_&2*&1_]x^[_&1-1_]'],
-						['[_-(&2)_]/{x^2}'],
-						['&2/{2sqrt(x)}'],
+						// ['&2'],
+						// ['[_&2*2_]x'],
+						// ['[_&2*&1_]x^[_&1-1_]'],
+						['[_-(&2)/{x^2}_]'],
+						// ['&2/{2sqrt(x)}'],
 					],
 					// pb mathlive : ascimath output
 					options: ['no-penalty-for-extraneous-brackets'],
-					correctionDetailss: [
-						[
-							{
-								text: '&solution',
-							},
-						],
-					],
+					// correctionDetailss: [
+					// 	[
+					// 		{
+					// 			text: '&solution',
+					// 		},
+					// 	],
+					// ],
 					defaultDelay: 20,
 					grade: PREMIERE_SPE_MATHS,
 				},

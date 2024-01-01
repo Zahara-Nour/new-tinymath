@@ -202,8 +202,11 @@ importers:
         specifier: ^10.4.3
         version: 10.4.3
     devDependencies:
+      '@jest/globals':
+        specifier: ^29.7.0
+        version: 29.7.0
       '@types/jest':
-        specifier: ^29.4.0
+        specifier: ^29.5.1
         version: 29.5.1
       '@types/node':
         specifier: ^18.11.18

@@ -24,7 +24,7 @@
 	import { Accordion, AccordionItem, Tab, TabGroup, getToastStore } from '@skeletonlabs/skeleton'
 	import QuestionCard from '$lib/ui/QuestionCard.svelte'
 	import { afterUpdate, beforeUpdate, onMount } from 'svelte'
-	import { formatLatexToHtml, storedGrade } from '$lib/stores'
+	import { formatLatexToHtml, fullScreen, storedGrade } from '$lib/stores'
 	import { get } from 'svelte/store'
 	import PageHeader from '$lib/ui/PageHeader.svelte'
 
@@ -334,8 +334,10 @@
 	}
 </script>
 
-<PageHeader title="Automaths" />
-<div class="container mx-auto px-2">
+<div class="container mx-auto px-4 pt-2">
+	{#if !$fullScreen}
+		<PageHeader title="Automaths" />
+	{/if}
 	<Buttons
 		bind:showBasket
 		bind:classroom

@@ -4,7 +4,9 @@
 	import Trio from './Trio.svelte'
 </script>
 
-{#if !$fullScreen}
-	<PageHeader title="Trio" />
-{/if}
-<Trio />
+<div class="container mx-auto px-4 pt-2">
+	{#if !$fullScreen}
+		<PageHeader title="Trio" />
+	{/if}
+	<Trio />
+</div>
