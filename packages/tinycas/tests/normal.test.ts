@@ -211,7 +211,14 @@ describe('Testing normal forms for litteral expressions', () => {
     ['&ans', '&ans'],
     ['&ans1', '&ans1'],
     ['&1', '&1'],
-    ['1+&1', '1+&1']
+    ['1+&1', '1+&1'],
+    ['1/x+1/x', '2*x^{-1}'],
+    ['1/sqrt(x)+1/sqrt(x)', '2*x^{-1/2}'],
+    ['8/{2sqrt(x)}', '4*x^{-1/2}'],
+    ['2/{8sqrt(x)}', 'x^{-1/2}/4'],
+    ['2/{-8sqrt(x)}', '-x^{-1/2}/4'],
+    ['{-2}/{-8sqrt(x)}', 'x^{-1/2}/4'],
+    ['{12x+15y}/{18a+21b}', '{4*x+5*y}/{6*a+7*b}']
   ];
 
   test.each(t)('normal form of %s', (e, expected) => {

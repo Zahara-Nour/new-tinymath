@@ -81,7 +81,11 @@ export default function generateQuestion(
 
 	// les regex correpondant aux expressions à évaluer
 	// const regexEval = /\[([.+(]*)_([^_]*?)(_(.+?))??_\]/g
-	const regexEval = /\[([.+(]*)_([^_]*?)(_([^_]*))??_\]/g
+	// [._..._] : évaluation décimale
+	// [+_..._] : évaluation en rajoutant un + si le résultat est positif
+	// [(_..._] : évaluation en rajoutant des parenthèses au résultat
+	// ['_..._] : dérivée de l'expression
+	const regexEval = /\[([.+(']*)_([^_]*?)(_([^_]*))??_\]/g
 	// const regexEval = /\[([.+(]*)_([^_]+)_(([^_])_)??\]/g
 
 	// [° °] : simple mise en forme LaTeX
@@ -97,22 +101,26 @@ export default function generateQuestion(
 			throw new Error(`Error while replacing : ${matched} - ${p1} - ${p2} - ${p3} - ${p4}`)
 		}
 
-		if (unit) {
-			params.unit = unit.trim()
-		}
+		if (modifiers.includes("'")) {
+			e = e.derivate()
+		} else {
+			if (unit) {
+				params.unit = unit.trim()
+			}
 
-		if (modifiers.includes('.')) {
-			params.decimal = true
-		}
+			if (modifiers.includes('.')) {
+				params.decimal = true
+			}
 
-		e = e.eval(params)
+			e = e.eval(params)
 
-		if (modifiers.includes('+') && !e.isOpposite()) {
-			e = e.positive()
-		}
+			if (modifiers.includes('+') && !e.isOpposite()) {
+				e = e.positive()
+			}
 
-		if (modifiers.includes('(') && (e.isOpposite() || e.isPositive())) {
-			e = e.bracket()
+			if (modifiers.includes('(') && (e.isOpposite() || e.isPositive())) {
+				e = e.bracket()
+			}
 		}
 
 		return e

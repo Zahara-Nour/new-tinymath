@@ -21562,7 +21562,7 @@ const questions: Questions = {
 						// ['&2'],
 						// ['[_&2*2_]x'],
 						// ['[_&2*&1_]x^[_&1-1_]'],
-						['[_-(&2)/{x^2}_]'],
+						["['_&2/x_]"],
 						// ['&2/{2sqrt(x)}'],
 					],
 					// pb mathlive : ascimath output
