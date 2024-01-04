@@ -8,6 +8,32 @@ body {
 	@apply h-full overflow-hidden;
 }
 
+h2 {
+	@apply mb-4 mt-8;
+}
+
+h2::first-letter {
+	@apply text-primary-500;
+}
+
+p {
+	@apply my-2 text-justify;
+}
+.anchor {
+	@apply text-primary-700-200-token;
+	text-decoration: none;
+}
+
+.emphase {
+	@apply font-semibold text-primary-500;
+}
+
+a[href*='http']::after {
+	/* font-weight: bold; */
+	/* color: navy; */
+	content: ' 🏄';
+}
+
 .btn {
 	@apply font-medium;
 }
