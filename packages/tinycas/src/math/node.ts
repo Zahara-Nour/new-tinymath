@@ -197,7 +197,10 @@ function createPNode(): Node {
     },
 
     get normal() {
-      if (!this._normal) this._normal = normalize(this);
+      if (!this._normal) {
+        const e = normalize(this, 1).node;
+        this._normal = normalize(e);
+      }
       return this._normal;
     },
 

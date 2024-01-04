@@ -643,8 +643,8 @@ describe('Testing derivating functions', () => {
 
   test.each(t2)('%s strictly equals to %s', (e, expected) => {
     const f = math(e);
-    console.log(`dérivée de ${f} : ${f.derivate()}`);
-    expect(f.derivate().strictlyEquals(math(expected))).toBeTruthy();
+    // console.log(`dérivée de ${f} : ${f.derivate()}`);
+    expect(f.derivate().string).toBe(expected);
     // expect(math(e).derivate().string).toBe("a")
   });
 });

@@ -66,6 +66,7 @@ import {
   Node,
   Normal,
   Numbr,
+  Opposite,
   ToNodeArg,
   ToStringArg,
   TYPE_ERROR,
@@ -75,7 +76,7 @@ import {
 } from './types';
 import { unit } from './unit';
 
-const defaultsToNode: ToNodeArg = { isUnit: false, formatTime: false };
+const defaultsToNode: ToNodeArg = { isUnit: false, formatTime: false, phase: 2 };
 
 const pNlist: Nlist = {
   type: TYPE_NSUM,
@@ -203,18 +204,21 @@ const pNlist: Nlist = {
   get node() {
     return this.toNode();
   },
+  get node1() {
+    return this.toNode(1);
+  },
 
   // NList --> Node
-  toNode() {
+  toNode(phase = 2) {
     const nProductElementToNode = function ([coef, base]: [Node, Node]) {
       // normalement coef est différent de 0
       // TODO: mise a jour ds parents ?
       let e = base;
-      if (coef.string === '1/2') {
+      if (phase === 2 && coef.string === '1/2') {
         e = radical([base]);
       } else if (!base.isOne() && !coef.isOne()) {
         // e = e.pow(coef.isNumber() || coef.isSymbol() ? coef : bracket([coef]))
-        if (e.isOpposite()) {
+        if (e.isOpposite() || e.isSum() || e.isDifference()) {
           e = e.bracket();
         }
         e = e.pow(coef);
@@ -246,8 +250,8 @@ const pNlist: Nlist = {
       e = number(0);
       for (let i = 0; i < this.children.length; i++) {
         const child = this.children[i];
-        let coef = isNlist(child[0]) ? child[0].node : child[0];
-        const base = (child[1] as Nlist).node;
+        let coef = isNlist(child[0]) ? child[0].toNode(phase) : child[0];
+        const base = (child[1] as Nlist).toNode(phase);
         let term: Node;
         let minus = false;
         if (base.isOne()) {
@@ -384,7 +388,7 @@ const pNormal: Normal = {
   },
 
   isPower() {
-    return this.isDefined() && this.node.isPower();
+    return this.isDefined() && this.node1.isPower();
   },
 
   isDivision() {
@@ -540,8 +544,58 @@ const pNormal: Normal = {
     if (!this.isSameQuantityType(e)) {
       throw new Error("Erreur d'unité");
     }
+    if (this.d.string === e.d.string) {
+      return normal(this.n.add(e.n), this.d, this.unit).reduce();
+    }
+    // else if (this.d.length === 1 && e.d.length === 1) {
+    //   const coef1 = this.d.first[0];
+    //   const base1 = this.d.first[1] as Nlist;
+    //   const factors1 = base1.children;
+    //   const coef2 = e.d.first[0] as Nlist;
+    //   const base2 = e.d.first[1] as Nlist;
+    //   const factors2 = base2.children;
+    //   const commons: NlistElements = [];
+    //   const new_factors1: NlistElements = [...factors1];
+    //   const new_factors2: NlistElements = [...factors2];
 
-    return normal(this.n.mult(e.d).add(e.n.mult(this.d)), this.d.mult(e.d), this.unit).reduce();
+    //   factors1.forEach((f1) => {
+    //     const c1 = f1[0] as Node;
+    //     const b1 = f1[1] as Node;
+    //     const i2 = new_factors2.findIndex((f) => f[1].string === b1.string);
+    //     if (i2 !== -1) {
+    //       const f2 = new_factors2[i2];
+    //       const c2 = f2[0] as Node;
+    //       const b2 = f2[1] as Node;
+    //       if (c1.isInt() && c2.isInt()) {
+    //         const i1 = new_factors1.findIndex((f) => f[1].string === b1.string);
+    //         const delta = c1.sub(c2).eval();
+    //         if (delta.isZero()) {
+    //           commons.push([c1, b1]);
+    //           new_factors1.splice(i1, 1);
+    //         } else if (delta.isOpposite()) {
+    //           commons.push([coef1, b1]);
+    //           new_factors2[i2][0] = (delta as Opposite).first;
+    //           new_factors1.splice(i1, 1);
+    //         } else {
+    //           commons.push([coef2, b1]);
+    //           new_factors1[i1][0] = delta;
+    //           new_factors2.splice(i2, 1);
+    //         }
+    //       }
+    //     }
+    //   });
+
+    //   const d1 = nSum([[coef1, nProduct(new_factors1)]]);
+    //   const d2 = nSum([[coef1, nProduct(new_factors1)]]);
+    //   const c = nSum([[coefOne(), nProduct(commons)]]);
+    //   if (commons.length) {
+    //     return normal(this.n.mult(d2).add(e.n.mult(d1)), d1.mult(d2).mult(c), this.unit).reduce();
+    //   } else {
+    //     return normal(this.n.mult(e.d).add(e.n.mult(this.d)), this.d.mult(e.d), this.unit).reduce();
+    //   }
+    // }
+    else
+      return normal(this.n.mult(e.d).add(e.n.mult(this.d)), this.d.mult(e.d), this.unit).reduce();
   },
 
   sub(e: Normal) {
@@ -553,7 +607,11 @@ const pNormal: Normal = {
       (!this.unit && e.unit)
     )
       throw new Error("Erreur d'unité");
-    return normal(this.n.mult(e.d).sub(e.n.mult(this.d)), this.d.mult(e.d), this.unit).reduce();
+    if (this.d.string === e.d.string) {
+      return normal(this.n.sub(e.n), this.d, this.unit).reduce();
+    } else {
+      return normal(this.n.mult(e.d).sub(e.n.mult(this.d)), this.d.mult(e.d), this.unit).reduce();
+    }
   },
 
   mult(exp: Normal | string | number | Decimal) {
@@ -576,84 +634,128 @@ const pNormal: Normal = {
     return this.mult(e.invert());
   },
 
-  pow(e: Normal) {
+  pow(e: Normal, phase: number = 2) {
     if (!this.isDefined()) return this;
     if (!e.isDefined()) return e;
     if (e.isZero()) return normOne(this.unit);
     if (e.isOne()) return this;
     if (this.isZero()) return this;
     if (this.isOne()) return this;
-    if (e.isMinusOne()) return this.invert();
 
-    let result: Normal;
-    if (isInt(e.node)) {
-      // e.node.value >=2
-      const n = e.node.value.toNumber();
-      result = this.mult(this);
-      if (n >= 3) {
-        for (let i = 1; i < n - 1; i++) {
-          result = result.mult(this);
-        }
-      }
-    } else if (isOpposite(e.node) && isInt(e.node.first)) {
-      const n = e.node.first.value.toNumber(); //n>=2
-      result = this.mult(this);
-      if (n >= 3) {
-        for (let i = 1; i < n - 1; i++) {
-          result = result.mult(this);
-        }
-      }
-      result = result.invert();
-    } else if (isProduct(this.node)) {
-      const factors = this.node.factors.map((factor) => factor.normal);
-      result = (factors.shift() as Normal).pow(e);
-      factors.forEach((factor) => {
-        result = result.mult(factor.pow(e));
-      });
-    } else if (this.isQuotient() || this.isDivision()) {
-      result = this.n.node.normal.pow(e).div(this.d.node.normal.pow(e));
-    } else if (isPower(this.node)) {
-      // const exp= fraction(this.node.last.string)
-      const exp = this.node.last.mult(e.node).eval();
-      result = this.node.first.normal.pow(exp.normal);
-    } else if (e.equalsTo(number(0.5).normal) && isInt(this.node)) {
-      if (this.node.value.sqrt().isInt()) {
-        result = number(this.node.value.sqrt()).normal;
-      } else {
-        const n = this.node.value.toNumber();
-        const k = RadicalReduction(n);
-        if (k === 1) {
-          const coef = nSum([[number(1), createBase(this.node, e.node)]]);
-          const n = nSum([[coef, baseOne()]]);
-          const d = nSumOne();
-          result = normal(n, d);
+    if (phase === 1) {
+      // puissance de puissance ?
+      // puissance de produit ?
+      // puissance de quotient ?
+      if (this.isProduct()) {
+        const factors = (this.n.children[0][1] as Nlist).children;
+        const new_factors: NlistElements = factors.map((factor) => [
+          (factor[0] as Node).mult(e.node1).eval(),
+          factor[1]
+        ]);
+        const n = nSum([[coefOne(), nProduct(new_factors)]]);
+        const d = nSumOne();
+
+        // TODO: et l'unité ???
+        return normal(n, d);
+      } else if (this.isPower()) {
+        const coef = (this.n.children[0][1] as Nlist).children[0][0] as Node;
+        const base = (this.n.children[0][1] as Nlist).children[0][1] as Node;
+        const n = nSum([[coefOne(), createBase(base, coef.mult(e.node1).eval())]]);
+        const d = nSumOne();
+        // console.log('n', n.string);
+        // console.log('d', d.string);
+
+        // TODO: et l'unité ???
+        return normal(n, d);
+      } else if (isOpposite(this.node1)) {
+        if (e.isInt()) {
+          return normalize(math('-1').pow(e.toNode({ phase })), 2).mult(
+            normalize(this.node1.first.pow(e.toNode({ phase })), phase)
+          );
         } else {
-          result = number(k).mult(number(n / (k * k)).pow(number(0.5))).normal;
+          return normalize(math('-1').pow(e.toNode({ phase })), 2).mult(
+            normalize(this.node1.first.pow(e.toNode({ phase })), phase)
+          );
         }
-      }
-    } else if (
-      isOpposite(e.node) &&
-      e.node.first.equals(number(0.5)) &&
-      isInt(this.node) &&
-      this.node.value.sqrt().isInt()
-    ) {
-      result = number(this.node.value.sqrt().toNumber()).normal.invert();
-    } else {
-      // TODO: parenthèses ??
-      let n: Nlist, d: Nlist;
-      if (this.isNumeric() && e.isNumeric()) {
-        const coef = nSum([[number(1), createBase(this.node, e.node)]]);
-        n = nSum([[coef, baseOne()]]);
-        d = nSumOne();
       } else {
-        n = nSum([[coefOne(), createBase(this.node, e.node)]]);
-        d = nSumOne();
-      }
+        const n = nSum([[coefOne(), createBase(this.node1, e.node1)]]);
+        const d = nSumOne();
 
-      // TODO: et l'unité ???
-      result = normal(n, d);
+        // TODO: et l'unité ???
+        return normal(n, d);
+      }
+    } else {
+      if (e.isMinusOne()) return this.invert();
+
+      let result: Normal;
+      if (isInt(e.node)) {
+        // e.node.value >=2
+        const n = e.node.value.toNumber();
+        result = this.mult(this);
+        if (n >= 3) {
+          for (let i = 1; i < n - 1; i++) {
+            result = result.mult(this);
+          }
+        }
+      } else if (isOpposite(e.node) && isInt(e.node.first)) {
+        const n = e.node.first.value.toNumber(); //n>=2
+        result = this.mult(this);
+        if (n >= 3) {
+          for (let i = 1; i < n - 1; i++) {
+            result = result.mult(this);
+          }
+        }
+        result = result.invert();
+      } else if (isProduct(this.node)) {
+        const factors = this.node.factors.map((factor) => factor.normal);
+        result = (factors.shift() as Normal).pow(e, phase);
+        factors.forEach((factor) => {
+          result = result.mult(factor.pow(e, phase));
+        });
+      } else if (this.isQuotient() || this.isDivision()) {
+        result = this.n.node.normal.pow(e, phase).div(this.d.node.normal.pow(e, phase));
+      } else if (isPower(this.node)) {
+        // const exp= fraction(this.node.last.string)
+        const exp = this.node.last.mult(e.node).eval();
+        result = this.node.first.normal.pow(exp.normal, phase);
+      } else if (e.equalsTo(number(0.5).normal) && isInt(this.node)) {
+        if (this.node.value.sqrt().isInt()) {
+          result = number(this.node.value.sqrt()).normal;
+        } else {
+          const n = this.node.value.toNumber();
+          const k = RadicalReduction(n);
+          if (k === 1) {
+            const coef = nSum([[number(1), createBase(this.node, e.node)]]);
+            const n = nSum([[coef, baseOne()]]);
+            const d = nSumOne();
+            result = normal(n, d);
+          } else {
+            result = number(k).mult(number(n / (k * k)).pow(number(0.5))).normal;
+          }
+        }
+      } else if (
+        isOpposite(e.node) &&
+        e.node.first.equals(number(0.5)) &&
+        isInt(this.node) &&
+        this.node.value.sqrt().isInt()
+      ) {
+        result = number(this.node.value.sqrt().toNumber()).normal.invert();
+      } else {
+        // TODO: parenthèses ??
+        let n: Nlist, d: Nlist;
+        if (this.isNumeric() && e.isNumeric()) {
+          const coef = nSum([[number(1), createBase(this.node, e.node)]]);
+          n = nSum([[coef, baseOne()]]);
+          d = nSumOne();
+        } else {
+          n = nSum([[coefOne(), createBase(this.node, e.node)]]);
+          d = nSumOne();
+        }
+        // TODO: et l'unité ???
+        result = normal(n, d);
+      }
+      return result;
     }
-    return result;
   },
 
   oppose() {
@@ -690,13 +792,16 @@ const pNormal: Normal = {
     return (this as Normal).toNode();
   },
 
+  get node1() {
+    return (this as Normal).toNode({ phase: 1 });
+  },
   //  si la forme représente une fraction numérique, celle-ci a été simplifiée et le signe
   // est au numérateur
-  toNode({ formatTime }: ToNodeArg = defaultsToNode) {
+  toNode({ formatTime, phase = 2 }: ToNodeArg = defaultsToNode) {
     if (!this.isDefined()) return notdefined(this.error as string);
     let e: Node;
-    let n = this.n.node;
-    const d = this.d.node;
+    let n = this.n.toNode(phase);
+    const d = this.d.toNode(phase);
 
     if (d.isOne()) {
       e = n;
@@ -855,7 +960,7 @@ function createBase(b: Node, e?: Node) {
   return nProduct([[e || number(1), b]]);
 }
 
-export default function normalize(node: Node): Normal {
+export default function normalize(node: Node, phase = 2): Normal {
   let d: Nlist = emptyList; // dénominateur de la partie normale
   let n: Nlist = emptyList; // numérateur de la partie normale
   let e: Normal | null = null; // forme normale retournée
@@ -874,7 +979,7 @@ export default function normalize(node: Node): Normal {
   }
   // Time
   else if (isTime(node)) {
-    const children = node.children.map((c) => c.normal);
+    const children = node.children.map((c) => normalize(c, phase));
     e = children.pop() as Normal;
     while (children.length) {
       e = e.add(children.pop() as Normal);
@@ -892,40 +997,40 @@ export default function normalize(node: Node): Normal {
       d = nSumOne();
     } else {
       // on convertit le float en fraction
-      e = math(fraction(node).toString()).normal;
+      e = normalize(math(fraction(node).toString()), phase);
     }
   }
   // Power
   else if (isPower(node)) {
-    e = node.first.normal.pow(node.last.normal);
+    e = normalize(node.first, phase).pow(normalize(node.last, phase), phase);
   }
   // Radical
   else if (isRadical(node)) {
-    e = node.first.normal.pow(number(0.5).normal);
+    e = normalize(node.first, phase).pow(normalize(number(0.5), phase), phase);
   }
   // Cos
   else if (isCos(node)) {
-    const childNormal = node.children[0].normal;
+    const childNormal = normalize(node.children[0], phase);
     const child = childNormal.node;
 
     if (childNormal.equalsTo(0) || childNormal.equalsTo('2pi')) {
-      e = math(1).normal;
+      e = normalize(math(1), 2);
     } else if (childNormal.equalsTo('pi') || childNormal.equalsTo('-pi')) {
-      e = math(-1).normal;
+      e = normalize(math(-1), 2);
     } else if (childNormal.equalsTo('pi/2') || childNormal.equalsTo('-pi/2')) {
-      e = math(0).normal;
+      e = normalize(math(0), 2);
     } else if (childNormal.equalsTo('pi/3') || childNormal.equalsTo('-pi/3')) {
-      e = math(0.5).normal;
+      e = normalize(math(0.5), 2);
     } else if (childNormal.equalsTo('2pi/3') || childNormal.equalsTo('-2pi/3')) {
-      e = math(-0.5).normal;
+      e = normalize(math(-0.5), 2);
     } else if (childNormal.equalsTo('pi/4') || childNormal.equalsTo('-pi/4')) {
-      e = math('sqrt(2)/2').normal;
+      e = normalize(math('sqrt(2)/2'), phase);
     } else if (childNormal.equalsTo('3pi/4') || childNormal.equalsTo('-3pi/4')) {
-      e = math('-sqrt(2)/2').normal;
+      e = normalize(math('-sqrt(2)/2'), phase);
     } else if (childNormal.equalsTo('pi/6') || childNormal.equalsTo('-pi/6')) {
-      e = math('sqrt(3)/2').normal;
+      e = normalize(math('sqrt(3)/2'), phase);
     } else if (childNormal.equalsTo('5pi/6') || childNormal.equalsTo('-5pi/6')) {
-      e = math('-sqrt(3)/2').normal;
+      e = normalize(math('-sqrt(3)/2'), phase);
     } else {
       const base = node.copy([child]);
       d = nSumOne();
@@ -939,7 +1044,7 @@ export default function normalize(node: Node): Normal {
   }
   // Sin
   else if (isSin(node)) {
-    const childNormal = node.children[0].normal;
+    const childNormal = normalize(node.children[0], phase);
     const child = childNormal.node;
 
     if (
@@ -948,23 +1053,23 @@ export default function normalize(node: Node): Normal {
       childNormal.equalsTo('pi') ||
       childNormal.equalsTo('-pi')
     ) {
-      e = math(0).normal;
+      e = normalize(math(0), 1);
     } else if (childNormal.equalsTo('pi/2')) {
-      e = math(1).normal;
+      e = normalize(math(1), 1);
     } else if (childNormal.equalsTo('-pi/2')) {
-      e = math(-1).normal;
+      e = normalize(math(-1), 1);
     } else if (childNormal.equalsTo('pi/6') || childNormal.equalsTo('5pi/6')) {
-      e = math(0.5).normal;
+      e = normalize(math(0.5), 1);
     } else if (childNormal.equalsTo('-pi/6') || childNormal.equalsTo('-5pi/6')) {
-      e = math(-0.5).normal;
+      e = normalize(math(-0.5), 1);
     } else if (childNormal.equalsTo('pi/4') || childNormal.equalsTo('3pi/4')) {
-      e = math('sqrt(2)/2').normal;
+      e = normalize(math('sqrt(2)/2'), phase);
     } else if (childNormal.equalsTo('-pi/4') || childNormal.equalsTo('-3pi/4')) {
-      e = math('-sqrt(2)/2').normal;
+      e = normalize(math('-sqrt(2)/2'), phase);
     } else if (childNormal.equalsTo('pi/3') || childNormal.equalsTo('2pi/3')) {
-      e = math('sqrt(3)/2').normal;
+      e = normalize(math('sqrt(3)/2'), 2);
     } else if (childNormal.equalsTo('-pi/3') || childNormal.equalsTo('-2pi/3')) {
-      e = math('-sqrt(3)/2').normal;
+      e = normalize(math('-sqrt(3)/2'), 2);
     } else {
       const base = node.copy([child]);
       d = nSumOne();
@@ -982,19 +1087,19 @@ export default function normalize(node: Node): Normal {
     const child = childNormal.node;
 
     if (childNormal.equalsTo(0)) {
-      e = math(0).normal;
+      e = normalize(math(0), 1);
     } else if (childNormal.equalsTo('pi/6')) {
-      e = math('1/sqrt(3)').normal;
+      e = normalize(math('1/sqrt(3)'), phase);
     } else if (childNormal.equalsTo('-pi/6')) {
-      e = math('-1/sqrt(3)').normal;
+      e = normalize(math('-1/sqrt(3)'), phase);
     } else if (childNormal.equalsTo('pi/4')) {
-      e = math(1).normal;
+      e = normalize(math(1), 1);
     } else if (childNormal.equalsTo('-pi/4')) {
-      e = math('-1').normal;
+      e = normalize(math('-1'), 1);
     } else if (childNormal.equalsTo('pi/3')) {
-      e = math('sqrt(3)').normal;
+      e = normalize(math('sqrt(3)'), phase);
     } else if (childNormal.equalsTo('-pi/3')) {
-      e = math('-sqrt(3)').normal;
+      e = normalize(math('-sqrt(3)'), phase);
     } else {
       const base = node.copy([child]);
       d = nSumOne();
@@ -1008,17 +1113,17 @@ export default function normalize(node: Node): Normal {
   }
   // Ln
   else if (isLn(node)) {
-    const childNormal = node.children[0].normal;
-    const child = childNormal.node;
+    const childNormal = normalize(node.children[0], phase);
+    const child = childNormal.toNode({ phase });
 
     if (isExp(child)) {
-      e = child.first.normal;
+      e = normalize(child.first, phase);
     } else if (isPower(child)) {
-      e = child.last.mult(child.first.ln()).normal;
+      e = normalize(child.last.mult(child.first.ln()), phase);
     } else if (childNormal.equalsTo(1)) {
-      e = math(0).normal;
+      e = normalize(math(0), 1);
     } else if (childNormal.equalsTo('e')) {
-      e = math(1).normal;
+      e = normalize(math(1), 1);
     } else if (isInt(child)) {
       const N = child.value.toNumber();
       const factors = primeFactors(N);
@@ -1028,11 +1133,11 @@ export default function normalize(node: Node): Normal {
         n = nSum([[coef, baseOne()]]);
         d = nSumOne();
       } else {
-        e = math(0).normal;
-        e = e.add(number(0).normal);
+        e = normalize(math(0), phase);
+        e = e.add(normalize(number(0), phase));
         factors.forEach((factor) => {
           const [a, k] = factor;
-          const term = math(`${k}*ln(${a})`).normal;
+          const term = normalize(math(`${k}*ln(${a})`), phase);
           e = (e as Normal).add(term);
         });
       }
@@ -1050,18 +1155,18 @@ export default function normalize(node: Node): Normal {
   // Exp
   else if (isExp(node)) {
     const child = node.first;
-    const childNormal = child.normal;
+    const childNormal = normalize(child, phase);
 
     if (isProduct(child) && (isLn(child.first) || isLn(child.last))) {
       if (isLn(child.first)) {
-        e = child.first.first.pow(child.last).normal;
+        e = normalize(child.first.first.pow(child.last), phase);
       } else {
-        e = (child.last as LogN).first.pow(child.first).normal;
+        e = normalize((child.last as LogN).first.pow(child.first), phase);
       }
     } else if (isLn(child)) {
-      e = child.first.normal;
+      e = normalize(child.first, phase);
     } else if (childNormal.equalsTo(0)) {
-      e = math(1).normal;
+      e = normalize(math(1), phase);
     } else {
       const base = node.copy([childNormal.node]);
       d = nSumOne();
@@ -1076,7 +1181,7 @@ export default function normalize(node: Node): Normal {
   // Abs
   else if (isAbs(node)) {
     const child = node.first;
-    const childNormal = child.normal;
+    const childNormal = normalize(child, phase);
     if (child.isNumeric()) {
       if (child.isLowerThan(0)) {
         e = childNormal.mult(-1);
@@ -1091,15 +1196,15 @@ export default function normalize(node: Node): Normal {
   }
   // Log
   else if (isLog(node)) {
-    const childNormal = node.children[0].normal;
+    const childNormal = normalize(node.children[0], phase);
     const child = childNormal.node;
 
     if (isPower(child)) {
-      e = child.last.mult(child.first.log()).normal;
+      e = normalize(child.last.mult(child.first.log()), phase);
     } else if (childNormal.equalsTo(1)) {
-      e = math(0).normal;
+      e = normalize(math(0), phase);
     } else if (childNormal.equalsTo(10)) {
-      e = math(1).normal;
+      e = normalize(math(1), phase);
     } else if (isInt(child)) {
       const N = child.value.toNumber();
       const factors = primeFactors(N);
@@ -1109,10 +1214,10 @@ export default function normalize(node: Node): Normal {
         n = nSum([[coef, baseOne()]]);
         d = nSumOne();
       } else {
-        e = math(0).normal;
+        e = normalize(math(0), phase);
         factors.forEach((factor) => {
           const [a, k] = factor;
-          const term = math(`${k}*log(${a})`).normal;
+          const term = normalize(math(`${k}*log(${a})`), phase);
           e = (e as Normal).add(term);
         });
       }
@@ -1129,10 +1234,10 @@ export default function normalize(node: Node): Normal {
   }
   //  Floor
   else if (isFloor(node)) {
-    const childNormal = node.children[0].normal;
+    const childNormal = normalize(node.children[0], phase);
     const child = childNormal.node;
     if (child.isNumeric()) {
-      e = number((child.eval({ decimal: true }) as Numbr).value.floor()).normal;
+      e = normalize(number((child.eval({ decimal: true }) as Numbr).value.floor()), phase);
     } else {
       const base = node.copy([child]);
       d = nSumOne();
@@ -1141,7 +1246,7 @@ export default function normalize(node: Node): Normal {
   }
   // PGCD
   else if (isPGCD(node)) {
-    const children = node.children.map((c) => c.normal.node);
+    const children = node.children.map((c) => normalize(c, phase).node);
     let a = children[0];
     let b = children[1];
     if (node.isNumeric()) {
@@ -1152,7 +1257,7 @@ export default function normalize(node: Node): Normal {
         b = b.first;
       }
       if (isInt(a) && isInt(b)) {
-        e = number(gcd(a.value.toNumber(), b.value.toNumber())).normal;
+        e = normalize(number(gcd(a.value.toNumber(), b.value.toNumber())), phase);
       } else {
         const base = node.copy(children);
         const coef = nSum([[number(1), createBase(base)]]);
@@ -1167,7 +1272,7 @@ export default function normalize(node: Node): Normal {
   }
   // Mod
   else if (isMod(node)) {
-    const children = node.children.map((c) => c.normal.node);
+    const children = node.children.map((c) => normalize(c, phase).node);
     const a = children[0];
     const b = children[1];
     if (node.isNumeric()) {
@@ -1175,7 +1280,7 @@ export default function normalize(node: Node): Normal {
         (isInt(a) || (isOpposite(a) && a.first.isInt())) &&
         (isInt(b) || (isOpposite(b) && b.first.isInt()))
       ) {
-        e = number(new Decimal(a.string).mod(new Decimal(b.string))).normal;
+        e = normalize(number(new Decimal(a.string).mod(new Decimal(b.string))), phase);
       } else {
         const base = node.copy(children);
         const coef = nSum([[number(1), createBase(base)]]);
@@ -1190,11 +1295,11 @@ export default function normalize(node: Node): Normal {
   }
   // Min, MinP
   else if (isMin(node) || isMinP(node)) {
-    const children = node.children.map((c) => c.normal.node);
+    const children = node.children.map((c) => normalize(c, phase).node);
     const a = children[0];
     const b = children[1];
     if (node.isNumeric()) {
-      e = a.isLowerThan(b) ? a.normal : b.normal;
+      e = a.isLowerThan(b) ? normalize(a, phase) : normalize(b, phase);
     } else {
       const base = node.copy(children);
       n = nSum([[coefOne(), createBase(base)]]);
@@ -1203,12 +1308,12 @@ export default function normalize(node: Node): Normal {
   }
   // MAx, MaxP
   else if (isMax(node) || isMaxP(node)) {
-    const children = node.children.map((c) => c.normal.node);
+    const children = node.children.map((c) => normalize(c, phase).node);
     const a = children[0];
     const b = children[1];
 
     if (node.isNumeric()) {
-      e = a.isGreaterThan(b) ? a.normal : b.normal;
+      e = a.isGreaterThan(b) ? normalize(a, phase) : normalize(b, phase);
     } else {
       const base = node.copy(children);
       n = nSum([[coefOne(), createBase(base)]]);
@@ -1217,7 +1322,7 @@ export default function normalize(node: Node): Normal {
   }
   // Percentage
   else if (isPercentage(node)) {
-    e = node.first.div(number(100)).normal;
+    e = normalize(node.first.div(number(100)), phase);
   }
   // Hole
   else if (isHole(node)) {
@@ -1240,30 +1345,69 @@ export default function normalize(node: Node): Normal {
   }
   // Opposite
   else if (isOpposite(node)) {
-    e = node.first.normal;
+    e = normalize(node.first, phase);
     if (!e.node.isZero()) e = e.oppose(); // pour ne pas avoir un -0
   }
   // Sum
   else if (isSum(node)) {
-    e = node.children[0].normal;
+    e = normalize(node.children[0], phase);
     for (let i = 1; i < node.children.length; i++) {
-      e = e.add(node.children[i].normal);
+      e = e.add(normalize(node.children[i], phase));
     }
   }
   // Product
   else if (isProduct(node) || isProductImplicit(node) || isProductPoint(node)) {
-    e = number(1).normal;
+    e = normalize(number(1), phase);
     for (let i = 0; i < node.children.length; i++) {
-      e = e.mult(node.children[i].normal);
+      e = e.mult(normalize(node.children[i], phase));
     }
   }
   // Difference
   else if (isDifference(node)) {
-    e = node.first.normal.sub(node.last.normal);
+    e = normalize(node.first, phase).sub(normalize(node.last, phase));
   }
   // Division
   else if (isDivision(node) || isQuotient(node)) {
-    e = node.first.normal.div(node.last.normal);
+    // type Factor = [Node, Number];
+    // function simplifyFactors(e: Node) {
+    //   const factors: Factor[] = [];
+    //   if (isProduct(e)) {
+    //     e.children.forEach(child=> {
+
+    //     })
+    //     e.children.reduce((acc, child) => {
+    //       acc = acc.concat(simplifyFactors(child))
+    //     }, [] as Factor[]);
+    //   }
+    // }
+
+    // tentative de simplifier d'abord car les développements de puissances de sommes ou de différences
+    // rendront l'opération impossible ensuite.
+    // const n = node.first;
+    // const d = node.last;
+
+    // const n_factors: Factor[] = [];
+    // const d_factors: Factor[] = [];
+
+    // il faudra essayer de factoriser d'abord
+    // if (
+    //   (isProduct(n) ||
+    //     isProductImplicit(n) ||
+    //     isProductPoint(n) ||
+    //     isPower(n) ||
+    //     isQuotient(n) ||
+    //     isDivision(n)) &&
+    //   (isProduct(d) ||
+    //     isProductImplicit(d) ||
+    //     isProductPoint(d) ||
+    //     isPower(d) ||
+    //     isQuotient(d) ||
+    //     isDivision(d))
+    // ) {
+    //   if (isProduct(n) || isProductImplicit(n) || isProductPoint(n)) {
+    //   }
+    // }
+    e = normalize(node.first, phase).div(normalize(node.last, phase));
   }
   // Relations
   else if (isRelations(node)) {
@@ -1273,31 +1417,31 @@ export default function normalize(node: Node): Normal {
       const test = math(node.children[i].string + op + node.children[i + 1]);
       bool = bool && (test.eval() as Bool).boolvalue;
     });
-    e = boolean(bool).normal;
+    e = normalize(boolean(bool), phase);
   }
   //  Unesquality
   else if (isUnequality(node)) {
-    e = boolean(!node.first.eval().equals(node.last.eval())).normal;
+    e = normalize(boolean(!node.first.eval().equals(node.last.eval())), phase);
   }
   // equality
   else if (isEquality(node)) {
-    e = boolean(node.first.eval().equals(node.last.eval())).normal;
+    e = normalize(boolean(node.first.eval().equals(node.last.eval())), phase);
   }
   // InequalityLess
   else if (isInequalityLess(node)) {
-    e = boolean(node.first.eval().isLowerThan(node.last.eval())).normal;
+    e = normalize(boolean(node.first.eval().isLowerThan(node.last.eval())), phase);
   }
   // InequalityMore
   else if (isInequalityMore(node)) {
-    e = boolean(node.first.eval().isGreaterThan(node.last.eval())).normal;
+    e = normalize(boolean(node.first.eval().isGreaterThan(node.last.eval())), phase);
   }
   // InequalityLessOrEqual
   else if (isInequalityLessOrEqual(node)) {
-    e = boolean(node.first.eval().isLowerOrEqual(node.last.eval())).normal;
+    e = normalize(boolean(node.first.eval().isLowerOrEqual(node.last.eval())), phase);
   }
   // InequalityMoreOrEqual
   else if (isInequalityMoreOrEQual(node)) {
-    e = boolean(node.first.eval().isGreaterOrEqual(node.last.eval())).normal;
+    e = normalize(boolean(node.first.eval().isGreaterOrEqual(node.last.eval())), phase);
   } else if (isTemplate(node)) {
     n = nSum([[coefOne(), createBase(node)]]);
     d = nSumOne();
