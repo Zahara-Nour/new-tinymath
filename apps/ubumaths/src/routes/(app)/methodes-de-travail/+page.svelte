@@ -170,7 +170,7 @@
 		<p>Tout ça en résumé :</p>
 		<img
 			class="mb-4"
-			src={$modeCurrent ? '/images/methodes-clair.png' : '/images/methodes-clair.png'}
+			src={$modeCurrent ? '/images/methodes-clair.png' : '/images/methodes-sombre.png'}
 		/>
 		<p>
 			Je termine avec une vidéo de David Louapre, dont je vous conseille la chaîne Youtube <a
