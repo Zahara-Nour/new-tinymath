@@ -530,7 +530,7 @@ export type Normal = {
   reduce: () => Normal;
   add: (e: Normal) => Normal;
   sub: (e: Normal) => Normal;
-  mult: (e: Normal | string | number | Decimal) => Normal;
+  mult: (e: Normal | string | number | Decimal, phase?: number) => Normal;
   div: (e: Normal) => Normal;
   pow: (e: Normal, phase?: number) => Normal;
   oppose: () => Normal;
@@ -562,7 +562,7 @@ export type Nlist = {
   readonly node: Node;
   readonly node1: Node;
   toNode: (phase?: number) => Node;
-  mult: (l: Nlist) => Nlist;
+  mult: (l: Nlist, phase?: number) => Nlist;
   add: (l: Nlist) => Nlist;
   sub: (l: Nlist) => Nlist;
   oppose: () => Nlist;

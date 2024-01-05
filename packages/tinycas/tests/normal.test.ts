@@ -1,7 +1,7 @@
 import { math } from '../src/math/math';
 import normalize from '../src/math/normal';
 
-describe.only('Testing normal forms for numerical expressions - phase 1', () => {
+describe('Testing normal forms for numerical expressions - phase 1', () => {
   // test('Root is set on children', () => {
   //   const e = math('2*3+4')
   //   expect(e.normal.string).toBe('2+3*4')
@@ -87,8 +87,8 @@ describe.only('Testing normal forms for numerical expressions - phase 1', () => 
     ['3+sqrt(2)+sqrt(2)', '3+2*sqrt(2)'],
     ['cos(3)+cos(3)', '2*cos(3)'],
     ['cos(3)+cos(4)', 'cos(3)+cos(4)'],
-    ['(2+3*sqrt(2))(4+5*sqrt(2))', '(2+3*sqrt(2))(4+5*sqrt(2))'],
-    ['(2-3*sqrt(2))(-4+5*sqrt(2))', '(2-3*sqrt(2))(-4+5*sqrt(2))']
+    ['(2+3*sqrt(2))(4+5*sqrt(2))', '(2+3*2^{1/2})*(4+5*2^{1/2})'],
+    ['(2-3*sqrt(2))(-4+5*sqrt(2))', '(2-3*2^{1/2})*(-4+5*2^{1/2})']
   ];
 
   test.each(t)('normal form of %s', (e, expected) => {

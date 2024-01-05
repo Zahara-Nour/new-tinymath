@@ -284,7 +284,7 @@ const pNlist: Nlist = {
     return e;
   },
 
-  mult(l: Nlist) {
+  mult(l: Nlist, phase = 2) {
     let t: NlistElements = [];
     if (this.type === TYPE_NPRODUCT) {
       t = t.concat(this.merge(l).children);
@@ -293,43 +293,107 @@ const pNlist: Nlist = {
     }
     //  NSum
     else {
-      // on boucle d'abord sur les termes des deux sommes que l'on doit multiplier deux à deux
-      for (const term1 of this) {
-        for (const term2 of l) {
-          const coefs: [Node, Nlist][] = [];
-          // on multiplie les coefs d'un côté, les bases de l'autre
-          const coef1 = term1[0] as Nlist; // nSum
-          const base1 = term1[1] as Nlist; // nProduct
-          const coef2 = term2[0] as Nlist; // nSum
-          const base2 = term2[1] as Nlist; // nProduct
-
-          // coef1 et coef2 sont des nSum, il faut les multiplier proprement
-          for (const [coefcoef1, basecoef1] of coef1) {
-            for (const [coefcoef2, basecoef2] of coef2) {
-              // coefcoef1 et coefcoef2 sont des nombres, fractions
-              // basecoef1 et basecoef2 sont des nProduct
-              // TODO: pourquoi ne pas faire les calculs sur des Decimal ?
-              // TODO: pourquoi que des valeurs entières ?
-              const newcoefvalue = parseInt(coefcoef1.string) * parseInt(coefcoef2.string);
-              const negative = newcoefvalue < 0;
-              let coef: Node = number(Math.abs(newcoefvalue));
-              let base = (basecoef1 as Nlist).mult(basecoef2 as Nlist);
-              if (isNumber(base.node) && !base.node.isOne()) {
-                coef = number((coef as Numbr).value.mul(base.node.value));
-                base = baseOne();
-              }
-              if (negative) coef = coef.oppose();
-              coefs.push([coef, base]);
-            }
+      if (phase === 1) {
+        let factors: Nlist = createBase(math(1));
+        let coef1: Nlist;
+        let coef2: Nlist;
+        if (l.length > 1) {
+          const base = math(l.string);
+          coef1 = coefOne();
+          factors = factors.merge(createBase(base));
+        } else {
+          // length === 1
+          coef1 = l.children[0][0] as Nlist;
+          const coef1node = coef1.toNode(phase);
+          if (!(coef1node.isNumber() || (isOpposite(coef1node) && coef1node.first.isNumber()))) {
+            factors = factors.merge(createBase(coef1.toNode(phase)));
+            coef1 = coefOne();
           }
-          // ne pas oublier de merger : (2+racine(3))(3+racine(3)) -> les bases changent de type
-          const coef = simpleCoef(number(0)).merge(nSum(coefs));
-          // A verfier : (1-x)(1+x)
-          // et si l'une des bases  vaut 1 ?
-          t.push([coef, base1.mult(base2)]);
+
+          const base = l.children[0][1] as Nlist;
+          factors = factors.merge(base);
         }
+
+        if (this.length > 1) {
+          const base = math(this.string);
+          coef2 = coefOne();
+          factors = factors.merge(createBase(base));
+        } else {
+          // length === 1
+          coef2 = this.children[0][0] as Nlist;
+          const coef2node = coef2.toNode(phase);
+          if (!(coef2node.isNumber() || (isOpposite(coef2node) && coef2node.first.isNumber()))) {
+            factors = factors.merge(createBase(coef2.toNode(phase)));
+            coef2 = coefOne();
+          }
+          const base = this.children[0][1] as Nlist;
+          factors = factors.merge(base);
+        }
+
+        const coefs: [Node, Nlist][] = [];
+        for (const [coefcoef1, basecoef1] of coef1) {
+          for (const [coefcoef2, basecoef2] of coef2) {
+            // coefcoef1 et coefcoef2 sont des nombres, fractions
+            // basecoef1 et basecoef2 sont des nProduct
+            // TODO: pourquoi ne pas faire les calculs sur des Decimal ?
+            // TODO: pourquoi que des valeurs entières ?
+            const newcoefvalue = parseInt(coefcoef1.string) * parseInt(coefcoef2.string);
+            const negative = newcoefvalue < 0;
+            let coef: Node = number(Math.abs(newcoefvalue));
+            let base = (basecoef1 as Nlist).mult(basecoef2 as Nlist);
+            if (isNumber(base.node) && !base.node.isOne()) {
+              coef = number((coef as Numbr).value.mul(base.node.value));
+              base = baseOne();
+            }
+            if (negative) coef = coef.oppose();
+            coefs.push([coef, base]);
+          }
+        }
+        // ne pas oublier de merger : (2+racine(3))(3+racine(3)) -> les bases changent de type
+        const coef = simpleCoef(number(0)).merge(nSum(coefs));
+
+        let t = factors.children;
+        t = t.filter((e) => !e[1].isOne());
+        return nSum([[coef, nProduct(t)]]);
+      } else {
+        // on boucle d'abord sur les termes des deux sommes que l'on doit multiplier deux à deux
+        for (const term1 of this) {
+          for (const term2 of l) {
+            const coefs: [Node, Nlist][] = [];
+            // on multiplie les coefs d'un côté, les bases de l'autre
+            const coef1 = term1[0] as Nlist; // nSum
+            const base1 = term1[1] as Nlist; // nProduct
+            const coef2 = term2[0] as Nlist; // nSum
+            const base2 = term2[1] as Nlist; // nProduct
+
+            // coef1 et coef2 sont des nSum, il faut les multiplier proprement
+            for (const [coefcoef1, basecoef1] of coef1) {
+              for (const [coefcoef2, basecoef2] of coef2) {
+                // coefcoef1 et coefcoef2 sont des nombres, fractions
+                // basecoef1 et basecoef2 sont des nProduct
+                // TODO: pourquoi ne pas faire les calculs sur des Decimal ?
+                // TODO: pourquoi que des valeurs entières ?
+                const newcoefvalue = parseInt(coefcoef1.string) * parseInt(coefcoef2.string);
+                const negative = newcoefvalue < 0;
+                let coef: Node = number(Math.abs(newcoefvalue));
+                let base = (basecoef1 as Nlist).mult(basecoef2 as Nlist);
+                if (isNumber(base.node) && !base.node.isOne()) {
+                  coef = number((coef as Numbr).value.mul(base.node.value));
+                  base = baseOne();
+                }
+                if (negative) coef = coef.oppose();
+                coefs.push([coef, base]);
+              }
+            }
+            // ne pas oublier de merger : (2+racine(3))(3+racine(3)) -> les bases changent de type
+            const coef = simpleCoef(number(0)).merge(nSum(coefs));
+            // A verfier : (1-x)(1+x)
+            // et si l'une des bases  vaut 1 ?
+            t.push([coef, base1.mult(base2)]);
+          }
+        }
+        return nSumZero().merge(nSum(t));
       }
-      return nSumZero().merge(nSum(t));
     }
   },
 
@@ -614,7 +678,7 @@ const pNormal: Normal = {
     }
   },
 
-  mult(exp: Normal | string | number | Decimal) {
+  mult(exp: Normal | string | number | Decimal, phase = 2) {
     const e = convertToNormal(exp);
     if (!this.isDefined()) return this;
     if (!e.isDefined()) return e;
@@ -624,7 +688,7 @@ const pNormal: Normal = {
     else unit = e.unit;
 
     if (unit && unit.string === '1') unit = undefined;
-    return normal(this.n.mult(e.n), e.d.mult(this.d), unit).reduce();
+    return normal(this.n.mult(e.n, phase), e.d.mult(this.d, phase), unit).reduce();
   },
 
   div(e: Normal) {
@@ -1359,7 +1423,7 @@ export default function normalize(node: Node, phase = 2): Normal {
   else if (isProduct(node) || isProductImplicit(node) || isProductPoint(node)) {
     e = normalize(number(1), phase);
     for (let i = 0; i < node.children.length; i++) {
-      e = e.mult(normalize(node.children[i], phase));
+      e = e.mult(normalize(node.children[i], phase), phase);
     }
   }
   // Difference
