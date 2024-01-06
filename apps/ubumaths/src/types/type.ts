@@ -115,10 +115,7 @@ type Subdomain = QuestionBase[]
 type Domain = Record<string, Subdomain>
 type Theme = Record<string, Domain>
 export type Questions = Record<string, Theme>
-export type AvailableLevels = Record<
-	string,
-	Record<string, Record<string, number[]>>
->
+export type AvailableLevels = Record<string, Record<string, Record<string, number[]>>>
 export type QuestionBase = {
 	'result-type'?: 'decimal'
 	answerFields?: string[]
@@ -156,6 +153,7 @@ export type QuestionBase = {
 	units?: string[]
 	variabless?: { [index: VariableName]: string }[]
 	multipleAnswers?: boolean
+	flash?: boolean
 }
 
 export type QuestionWithID = QuestionBase & {
@@ -231,9 +229,7 @@ export function isQuestionAnswerField(q: Question): q is QuestionAnswerField {
 	return !!q.answerField
 }
 
-export function isQuestionResultOrRewrite(
-	q: Question,
-): q is QuestionResultOrRewrite {
+export function isQuestionResultOrRewrite(q: Question): q is QuestionResultOrRewrite {
 	return !(
 		isQuestionChoice(q) ||
 		isQuestionFillIn(q) ||
@@ -266,9 +262,7 @@ export type AnsweredQuestionOther = AnsweredQuestionBase & {
 
 export type AnsweredQuestion = AnsweredQuestionChoice | AnsweredQuestionOther
 
-export function isAnsweredQuestionChoice(
-	q: AnsweredQuestion,
-): q is AnsweredQuestionChoice {
+export function isAnsweredQuestionChoice(q: AnsweredQuestion): q is AnsweredQuestionChoice {
 	return isQuestionChoice(q) || isQuestionChoices(q)
 }
 
@@ -298,12 +292,7 @@ export type CorrectedQuestion = AnsweredQuestion & {
 }
 
 export type ObjectWithText = { text: string }
-export type FormatToLatexArg =
-	| undefined
-	| null
-	| object
-	| string
-	| Array<object | string>
+export type FormatToLatexArg = undefined | null | object | string | Array<object | string>
 export type FormatToTexmacsArg = null | object | string | Array<object | string>
 export type FormatToHtmlArg = null | object | string | Array<object | string>
 
@@ -433,11 +422,7 @@ export type UserProto = {
 	isGuest: () => boolean
 }
 
-export type UserProfile =
-	| AdminProfile
-	| StudentProfile
-	| TeacherProfile
-	| GuestProfile
+export type UserProfile = AdminProfile | StudentProfile | TeacherProfile | GuestProfile
 export type Admin = AdminProfile & UserProto
 export type Student = StudentProfile & UserProto
 export type Teacher = TeacherProfile & UserProto
@@ -517,13 +502,7 @@ export type StudentData = Omit<
 
 export type TeacherData = Omit<
 	Database['public']['Tables']['users']['Row'],
-	| 'created_at'
-	| 'updated_at'
-	| 'vips'
-	| 'teacher_id'
-	| 'gidouilles'
-	| 'grade'
-	| 'teacher_uuid'
+	'created_at' | 'updated_at' | 'vips' | 'teacher_id' | 'gidouilles' | 'grade' | 'teacher_uuid'
 >
 
 export type AdminData = Omit<

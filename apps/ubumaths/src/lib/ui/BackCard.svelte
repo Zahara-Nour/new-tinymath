@@ -77,8 +77,14 @@
 			} else if (s.image) {
 				s = `<img src=${s.image}>`
 			}
-		} else if (isQuestionResultOrRewrite(card)) {
-			s = '$$' + putSolutions(card.answerFormat_latex, card) + '$$'
+		}
+		// c'est le cas par défaut !!!
+		else if (isQuestionResultOrRewrite(card)) {
+			if (card.solutions?.length) {
+				s = '$$' + putSolutions(card.answerFormat_latex, card) + '$$'
+			} else {
+				s = ''
+			}
 		} else if (isQuestionAnswerField(card)) {
 			if (card.solutions?.length > 1) {
 				s = putSolutions(
@@ -94,6 +100,7 @@
 		} else {
 			s = card.solutions![0] as string
 			s = '$$' + math(s).latex + '$$'
+			s = 'toto'
 		}
 		return s
 	}
@@ -127,9 +134,11 @@
 		{:else}
 			<!-- solution générique -->
 			<div class="">Réponse :</div>
-			<div class="relative z-0 my-5" style={`font-size:${magnify_3xl};`}>
-				{@html solution}
-			</div>
+			{#if !(card.flash && !solution)}
+				<div class="relative z-0 my-5" style={`font-size:${magnify_3xl};`}>
+					{@html solution}
+				</div>
+			{/if}
 			{#if card.imageCorrection}
 				{#await card.imageCorrectionBase64P}
 					loading image

@@ -21,6 +21,8 @@
 	import { getToastStore } from '@skeletonlabs/skeleton'
 	import PageHeader from '$lib/ui/PageHeader.svelte'
 	import IconNumberList from '$lib/ui/icons/IconNumberList.svelte'
+	import IconChevronLeft from '$lib/ui/icons/IconChevronLeft.svelte'
+	import IconChevronRight from '$lib/ui/icons/IconChevronRight.svelte'
 
 	export let data
 
@@ -138,7 +140,6 @@
 		console.log('training', training)
 		testParams.courseAuxNombres = courseAuxNombres
 		testParams.classroom = classroom
-		testParams.flash = flash
 
 		basket = decodeUrlParam('questions')
 
@@ -176,6 +177,9 @@
 			;({ theme, domain, subdomain, level } = questions_ids[basket[0].id])
 			query = encodeURI(`?theme=${theme}&domain=${domain}&subdomain=${subdomain}&level=${level}`)
 		}
+		flash = flash || cards.some((card) => card.flash)
+		testParams.flash = flash
+
 		shuffle(cards)
 
 		cards.forEach((q, i) => {
@@ -447,11 +451,11 @@
 				</div>
 			{/if}
 
-			<div id="cards-container" class="m-auto">
+			<div id="cards-container">
 				{#key card}
-					<div
-						in:fly={{ x: 500, duration: 500, delay: 200 }}
-						out:fly={{ x: -500, duration: 500 }}
+					<span
+						in:fly={{ x: 500, duration: 400, delay: 400 }}
+						out:fly={{ x: -500, duration: 400 }}
 						class="flex justify-center"
 					>
 						<QuestionCard
@@ -462,13 +466,26 @@
 							immediateCommit={true}
 							flashcard={flash}
 						/>
-					</div>
+					</span>
 				{/key}
 			</div>
-			<div>
+			<div class="flex">
 				<a href={`/automaths${query}`}>
 					<button class="btn-icon variant-filled-primary"><IconHome /></button>
 				</a>
+				{#if flash}
+					<div class="flex-auto"></div>
+					<button
+						disabled={current === 0}
+						on:click={previousCard}
+						class="btn-icon variant-filled-primary mx-2"><IconChevronLeft /></button
+					>
+					<button
+						disabled={current === cards.length - 1}
+						on:click={change}
+						class="btn-icon variant-filled-primary mx-2"><IconChevronRight /></button
+					>
+				{/if}
 			</div>
 		</div>
 	{:else}
@@ -476,14 +493,13 @@
 	{/if}
 </div>
 
-<style>
+<style lang="postcss">
 	#cards-container {
 		margin-top: 20px;
 		margin-bottom: 20px;
-		position: relative;
-		display: grid;
-		grid-template-rows: 1fr;
-		grid-template-columns: 1fr;
+		/* display: grid; */
+		/* grid-template-rows: 1fr; */
+		/* grid-template-columns: 1fr; */
 		/* display: flex; */
 		/* flex-direction: column; */
 		/* overflow-x: hidden; */

@@ -595,7 +595,7 @@ export default function generateQuestion(
 
 		// TODO: il faut peut etre purifier encore plus la solution, quoique c'est surement fait plus tard
 		solutions = [math(expression).eval(params).removeMultOperator().removeFactorsOne().string]
-	} else if (!testAnswers) {
+	} else if (!testAnswers && !question.flash) {
 		throw new Error('impossible de determiner une bonne réponse')
 	}
 

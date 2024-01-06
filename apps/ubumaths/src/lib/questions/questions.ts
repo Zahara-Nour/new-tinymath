@@ -21579,6 +21579,54 @@ const questions: Questions = {
 				},
 			],
 		},
+		'Etude de fonction': {
+			Flash: [
+				{
+					description: 'Etude de fonction : questions .',
+					enounces: [
+						'Que cherche-t-on à savoir quand on étudie une fonction ?',
+						"A quels endroits doit-on chercher les limites d'une fonctions ?",
+						"Que permet de trouver la dérivée d'une fonction ?",
+						'Que doit-on faire en premier quand on étudie une fonction ?',
+					],
+					correctionDetailss: [
+						[
+							{
+								text: `<p>On cherche :</p>
+								<ul class='list'> 
+								<li><span>-</span><span>les variations de la fonction,</span></li>
+								<li><span>-</span><span>ses extremums,</span></li>
+								<li><span>-</span><span>ses limites aux bornes de son ensemble de définition,</span></li>
+								<li><span>-</span><span>son signe.</span></li>
+								</ul> 
+								`,
+							},
+						],
+						[
+							{
+								text: `<p>Aux bornes de son ensemble de définition.</p>
+								`,
+							},
+						],
+						[
+							{
+								text: `<p>Ses variations et ses extremums.</p>
+								`,
+							},
+						],
+						[
+							{
+								text: `<p>On doit la tracer sur la calculatrice.</p>
+								`,
+							},
+						],
+					],
+					defaultDelay: 20,
+					grade: PREMIERE_SPE_MATHS,
+					flash: true,
+				},
+			],
+		},
 	},
 
 	Suites: {
