@@ -6,7 +6,7 @@
 	import { createTimer } from '$lib/timer'
 	import { page } from '$app/stores'
 	import { virtualKeyboardMode, touchDevice, mathliveReady } from '$lib/stores'
-	import { fly } from 'svelte/transition'
+	import { fade, fly } from 'svelte/transition'
 
 	import Correction from './Correction.svelte'
 	import type { AnsweredQuestion, Basket, Commit, Time, Timer } from '../../../../types/type'
@@ -453,11 +453,7 @@
 
 			<div id="cards-container">
 				{#key card}
-					<span
-						in:fly={{ x: 500, duration: 400, delay: 400 }}
-						out:fly={{ x: -500, duration: 400 }}
-						class="flex justify-center"
-					>
+					<span in:fade={{ duration: 500, delay: 100 }} class="flex justify-center">
 						<QuestionCard
 							class={classroom ? 'max-w-3xl' : 'max-w-xl'}
 							{card}

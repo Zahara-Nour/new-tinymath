@@ -288,7 +288,7 @@
 		if (!masked && mathField && !initialized) {
 			window.mathVirtualKeyboard.layouts = [
 				{
-					label: '',
+					label: '123',
 					rows: [
 						[
 							'[7]',
@@ -338,7 +338,7 @@
 					],
 				},
 				{
-					label: '',
+					label: 'abc',
 					rows: [
 						['a', 'z', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', { label: '[backspace]', width: 1 }],
 						['q', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', '[left]', '[right]'],
@@ -355,7 +355,7 @@
 						],
 					],
 				},
-				'alphabetic',
+				// 'alphabetic',
 			]
 			mathField.mathModeSpace = '\\,'
 			mathField.addEventListener('keypress', onKeystroke)

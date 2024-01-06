@@ -1,5 +1,5 @@
 // global store
-import type { MathfieldElement } from '@repo/tinymathlive'
+import { MathfieldElement } from '@repo/tinymathlive'
 import { get, writable, type Writable } from 'svelte/store'
 import type { FormatToHtmlArg, User } from '../types/type'
 import { isObjectWithText } from './utils'
@@ -41,6 +41,7 @@ export function prepareMathlive() {
 		import('@repo/tinymathlive')
 			.then((m) => {
 				mathliveReady.set(true)
+				MathfieldElement.decimalSeparator = ','
 				mathfieldElement.set(m.MathfieldElement)
 				toMarkup.set(m.convertLatexToMarkup)
 				const regex = /\$\$(.*?)\$\$/g
