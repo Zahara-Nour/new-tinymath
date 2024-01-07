@@ -36,15 +36,31 @@ export function generateQuestionsFromBasket(basket: Basket, questions: AnsweredQ
 		//  check that delay is a multiple of five
 		const rest = delay % 5
 		delay = delay + 5 - rest
+		let count = q.count
+		if (question.options?.includes('exhaust')) {
+			const n = Math.max(
+				question.choicess?.length || 0,
+				question.expressions?.length || 0,
+				question.expressions2?.length || 0,
+				question.enounces?.length || 0,
+				question.enounces2?.length || 0,
+				question.variabless?.length || 0,
+				question.images?.length || 0,
+				question.answerFields?.length || 0,
+				question.answerFormats?.length || 0,
+				question.prefilleds?.length || 0,
+			)
+			count = Math.min(count, n)
+		}
 
-		for (let i = 0; i < q.count; i++) {
-			const generated = generateQuestion(question, questions, q.count, offset)
+		for (let i = 0; i < count; i++) {
+			const generated = generateQuestion(question, questions, count, offset)
 			generated.delay = delay
 			console.log('generated', generated)
 
 			questions.push(prepareAnsweredQuestion(generated))
 		}
-		offset += q.count
+		offset += count
 	})
 }
 export default function generateQuestion(
@@ -309,7 +325,7 @@ export default function generateQuestion(
 	let repeat = false
 	const availables: number[] = [] // liste des index encore disponibles dans la liste de questions possibles
 
-	// sur combien d'éléments peut-onchour une question
+	// sur combien d'éléments peut-on choisir une question
 	const n = Math.max(
 		question.choicess?.length || 0,
 		question.expressions?.length || 0,
@@ -322,9 +338,10 @@ export default function generateQuestion(
 		question.answerFormats?.length || 0,
 		question.prefilleds?.length || 0,
 	)
+	console.log('****  n', n)
 
 	// les limites permettent que les différentes expressions possibles pour la question
-	// soient générées à peu près dans la même proportion
+	// soient générées à peu près dans les mêmes proportions
 	// les limites sont mises à jours à chaque nouvelle génération, dans l'objet initial
 	if (!question.limits && nbquestions !== 1) {
 		question.limits = { limits: [] }
@@ -333,6 +350,7 @@ export default function generateQuestion(
 			question.limits.limits[i] = {}
 			question.limits.limits[i].count = 0
 
+			// questions ou il n'y a pas d'aléatoires
 			if (options.includes('exhaust')) {
 				nbuniques += 1
 				question.limits.limits[i].limit = 1

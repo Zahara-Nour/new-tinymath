@@ -21622,6 +21622,7 @@ const questions: Questions = {
 						],
 					],
 					defaultDelay: 20,
+					options: ['exhaust'],
 					grade: PREMIERE_SPE_MATHS,
 					flash: true,
 				},
