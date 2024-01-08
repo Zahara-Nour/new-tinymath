@@ -20,10 +20,10 @@
 	let lang = 'fr'
 
 	const today = DateTime.now()
-	const term1Start = DateTime.fromISO('2022-09-01')
-	const term2Start = DateTime.fromISO('2022-12-15')
-	const term3Start = DateTime.fromISO('2023-03-15')
-	const yearEnd = DateTime.fromISO('2023-06-01')
+	const term1Start = DateTime.fromISO('2023-09-01')
+	const term2Start = DateTime.fromISO('2023-12-04')
+	const term3Start = DateTime.fromISO('2024-03-15')
+	const yearEnd = DateTime.fromISO('2024-06-01')
 
 	$: getWarnings(student)
 
@@ -55,7 +55,7 @@
 					},
 					{} as Record<string, string[]>,
 				)
-			markTerm1 = Object.entries(warningsTerm3ByDate).length
+			markTerm1 = Object.entries(warningsTerm1ByDate).length
 				? (Object.entries(warningsTerm1ByDate).filter((entry) => entry[1].length).length /
 						Object.entries(warningsTerm1ByDate).length) *
 					20
@@ -73,10 +73,24 @@
 					},
 					{} as Record<string, string[]>,
 				)
-			markTerm2 = Object.entries(warningsTerm3ByDate).length
-				? (Object.entries(warningsTerm2ByDate).filter((entry) => entry[1].length).length /
-						Object.entries(warningsTerm2ByDate).length) *
-					20
+			// markTerm2 = Object.entries(warningsTerm2ByDate).length
+			// 	? Math.round(
+			// 			(Object.entries(warningsTerm2ByDate).filter((entry) => entry[1].length).length /
+			// 				Object.entries(warningsTerm2ByDate).length) *
+			// 				20 *
+			// 				10,
+			// 		) / 10
+			// 	: null
+
+			markTerm2 = Object.entries(warningsTerm2ByDate).length
+				? Math.round(
+						(Object.entries(warningsTerm2ByDate).filter((entry) => !entry[1].length).length /
+							Object.values(warningsTerm2ByDate).filter(
+								(warnings) => !(warnings.length === 1 && warnings[0] === 'Absent'),
+							).length) *
+							20 *
+							10,
+					) / 10
 				: null
 
 			warningsTerm3ByDate = data
@@ -141,6 +155,35 @@
 					<svelte:fragment slot="content">
 						<div class="border-l-2 pl-2">
 							{#each Object.entries(warningsTerm3ByDate) as [date, warnings] (date)}
+								{@const dateTime = DateTime.fromISO(date)}
+								{#if warnings.length > 0}
+									<h4 class="mt-4">
+										{dateTime.toLocaleString(DateTime.DATE_FULL)}
+									</h4>
+
+									<ul class="list">
+										{#each warnings as warning}
+											<li>{warningCases[lang][warning]}</li>
+										{/each}
+									</ul>
+								{/if}
+							{/each}
+						</div>
+					</svelte:fragment>
+				</AccordionItem>
+			{:else if today >= term2Start}
+				<AccordionItem open>
+					<svelte:fragment slot="summary"
+						><div class="bg-tertiary-500 rounded p-2">
+							<h3>
+								{`Trimestre 2 - Note de travail et de comportement : ${markTerm2}
+								/20`}
+							</h3>
+						</div></svelte:fragment
+					>
+					<svelte:fragment slot="content">
+						<div class="border-l-2 pl-2">
+							{#each Object.entries(warningsTerm2ByDate) as [date, warnings] (date)}
 								{@const dateTime = DateTime.fromISO(date)}
 								{#if warnings.length > 0}
 									<h4 class="mt-4">
