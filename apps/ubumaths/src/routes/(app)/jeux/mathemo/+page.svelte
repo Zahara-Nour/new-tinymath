@@ -20,6 +20,8 @@
 		'Great !',
 	]
 
+	let checking = false
+
 	$: console.log('correctLetters', data.correctLetters)
 	$: console.log('size', data.size)
 
@@ -99,7 +101,7 @@
 
 <svelte:head>
 	<title>Mathemo</title>
-	<meta name="description" content="A Wordle clone written in SvelteKit" />
+	<meta name="description" content="Un clone de Wordle adapté au cours de Maths" />
 </svelte:head>
 
 {#if !$fullScreen}
