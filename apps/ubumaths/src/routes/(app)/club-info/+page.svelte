@@ -11,9 +11,9 @@
 		<ul class="list">
 			<li>
 				<span>-</span>
-				<a class="anchor" target="_blank" href="https://learn.svelte.dev/tutorial/welcome-to-svelte"
-					>Turorial</a
-				>
+				<a class="anchor" target="_blank" href="https://www.codecademy.com/learn/learn-html"
+					>Code Academy learn HTML
+				</a>
 			</li>
 			<li>
 				<span>-</span>
@@ -36,6 +36,21 @@
 		</ul>
 
 		<h4 class="h4">SvelteKit</h4>
+		<ul class="list">
+			<li>
+				<span>-</span>
+				<a
+					class="anchor"
+					target="_blank"
+					href="https://learn.svelte.dev/tutorial/introducing-sveltekit">Turorial</a
+				>
+			</li>
+			<li>
+				<span>-</span>
+				<a class="anchor" target="_blank" href="https://kit.svelte.dev/docs/introduction">Docs</a>
+			</li>
+		</ul>
+		<h4 class="h4">Tailwind</h4>
 		<ul class="list">
 			<li>
 				<span>-</span>
