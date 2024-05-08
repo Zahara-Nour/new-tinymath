@@ -26,6 +26,8 @@
 		positions: Position[]
 	}
 
+	type Targets = number[]
+
 	const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 	let classCorrection =
 		'flex justify-center items-center  rounded-lg p-6  mx-4  w-20 h-20 text-5xl font-bold '
@@ -35,11 +37,13 @@
 		'flex justify-center items-center rounded-lg mx-4  w-20 h-20 variant-filled-error text-5xl font-bold '
 
 	let grid: Grid = []
+	const targets: Targets = []
 	let target: Target = {
 		positions: [],
 		op: Math.random() < 0.5 ? '+' : '-',
 		value: -1,
 	}
+
 	let result: number | null = null
 	let op = '+'
 	let win = false
@@ -271,7 +275,8 @@
 			} else {
 				target.value = -1
 			}
-		} while (target.value < 0)
+		} while (target.value < 0 || targets.includes(target.value))
+		targets.push(target.value)
 	}
 </script>
 
