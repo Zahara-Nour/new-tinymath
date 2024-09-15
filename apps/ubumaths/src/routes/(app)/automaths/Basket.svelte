@@ -19,50 +19,25 @@
 	import { goto } from '$app/navigation'
 	import type { SupabaseClient } from '@supabase/supabase-js'
 	import type { Database } from '../../../types/supabase'
-	import { DB_fetchAssessment } from '$lib/db'
 
 	export let basket: Basket = []
 	export let courseAuxNombres = false
 	export let enounceAlone = false
-	export let assessment_id = 0
+
 	export let db: SupabaseClient<Database>
 
 	const toastStore = getToastStore()
 	const modalStore = getModalStore()
 	let { warn, trace, fail } = getLogger('Basket', 'warn')
 
-	let evalTitle = ''
+	export let evalTitle = ''
 	let isTitleAvailable = false
 	let titles: { title: string; id: number }[] | null = null
-
-	if (assessment_id) {
-		loadBasket(assessment_id)
-	}
 
 	fetchTitles()
 
 	$: isTitleAvailable = checkEvalTitleAvailability(evalTitle, titles)
 	$: console.log('isTitleAvailable: ', isTitleAvailable)
-
-	async function loadBasket(assessment_id: number) {
-		const { error, data } = await DB_fetchAssessment(db, assessment_id)
-		if (error) {
-			fail(error)
-			toastStore.trigger({
-				message: "Impossible de charger l'évaluation",
-				background: 'bg-error-500',
-			})
-		} else if (!data) {
-			fail('No data returned for assessment ' + assessment_id)
-			toastStore.trigger({
-				message: "Impossible de charger l'évaluation",
-				background: 'bg-error-500',
-			})
-		} else {
-			basket = JSON.parse(data.questions as string)
-			evalTitle = data.title
-		}
-	}
 
 	const submitSave: SubmitFunction = (params) => {
 		if (isTitleAvailable) {
@@ -247,7 +222,7 @@
 		</div>
 	{/each}
 
-	{#if assessment_id}
+	<!-- {#if assessment_id}
 		<div class="my-4 flex justify-center">
 			<button
 				on:click={() => {
@@ -256,7 +231,7 @@
 				class="btn variant-filled-primary">Retourner aux évaluations</button
 			>
 		</div>
-	{/if}
+	{/if} -->
 	<h2>Créer une évaluation</h2>
 	<form method="POST" use:enhance={submitSave}>
 		<div class="my-4">

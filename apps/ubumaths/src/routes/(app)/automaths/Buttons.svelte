@@ -25,7 +25,9 @@
 	export let generateExoTexmacs: () => void
 
 	const toggleExemple = () => (displayExemple = !displayExemple)
-	const toggleBasket = () => (showBasket = !showBasket)
+	const toggleBasket = () => {
+		showBasket = !showBasket
+	}
 	const toggleClassroom = () => (classroom = !classroom)
 	const toggleFlash = () => (flash = !flash)
 	const toggleCourseAuxNombres = () => (courseAuxNombres = !courseAuxNombres)

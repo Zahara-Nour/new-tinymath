@@ -27,6 +27,7 @@
 	import { formatLatexToHtml, fullScreen, storedGrade } from '$lib/stores'
 	import { get } from 'svelte/store'
 	import PageHeader from '$lib/ui/PageHeader.svelte'
+	import { DB_fetchAssessment } from '$lib/db'
 
 	export let data
 
@@ -36,7 +37,7 @@
 	const domain_url_params = decodeURI($page.url.searchParams.get('domain') || '')
 	const subdomain_url_params = decodeURI($page.url.searchParams.get('subdomain') || '')
 	const level_url_params = parseInt(decodeURI($page.url.searchParams.get('level') || '') || '0', 10)
-	const assessment_url_params = parseInt(
+	let assessment_url_params = parseInt(
 		decodeURI($page.url.searchParams.get('assessment') || '') || '0',
 		10,
 	)
@@ -53,7 +54,7 @@
 	let level = level_url_params
 	let displayExemple = false
 	let generated: CorrectedQuestion
-	let showBasket = !!assessment_url_params
+	let showBasket = !!assessment_url_params //le panier s'affiche par défaut si on veut modifier une eval à partir du dashboard
 	let classroom = false
 	let flash = false
 	let courseAuxNombres = false
@@ -61,9 +62,13 @@
 	let basket: BasketType = []
 	let interactive = false
 	let selectedGrade = grade
+	let evalTitle = ''
+	let db = data.supabase
 
 	const classSelected = 'ml-1 mb-2 btn-icon variant-filled-primary'
 	const classNotSelected = 'ml-1 mb-2 btn-icon variant-filled-tertiary'
+
+	if (assessment_url_params) loadBasket(assessment_url_params)
 
 	$: changeGrade(selectedGrade)
 	$: if (courseAuxNombres) {
@@ -73,6 +78,25 @@
 		basket = basket
 	}
 
+	async function loadBasket(assessment_id: number) {
+		const { error, data } = await DB_fetchAssessment(db, assessment_id)
+		if (error) {
+			fail(error)
+			toastStore.trigger({
+				message: "Impossible de charger l'évaluation",
+				background: 'bg-error-500',
+			})
+		} else if (!data) {
+			fail('No data returned for assessment ' + assessment_id)
+			toastStore.trigger({
+				message: "Impossible de charger l'évaluation",
+				background: 'bg-error-500',
+			})
+		} else {
+			basket = JSON.parse(data.questions as string)
+			evalTitle = data.title
+		}
+	}
 	function generateExoTexmacs() {
 		let questions: BasketItem[] = []
 		if (basket.length) {
@@ -365,12 +389,7 @@
 
 	{#if showBasket}
 		<!-- {#if isTeacher && showBasket} -->
-		<Basket
-			db={data.supabase}
-			assessment_id={assessment_url_params}
-			bind:basket
-			{courseAuxNombres}
-		/>
+		<Basket {db} bind:basket {courseAuxNombres} bind:evalTitle />
 	{:else if theme}
 		<TabGroup
 			justify="justify-start flex-wrap"
