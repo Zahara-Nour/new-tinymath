@@ -59,6 +59,7 @@
 	let go = false
 	let assignmentId: number
 	let training = true
+	let oneTypeQuestion = false
 
 	const testParams: TestParams = {}
 	const commit: Commit = {
@@ -186,11 +187,14 @@
 			q.num = i + 1
 		})
 
-		if (classroom && basket.length === 1) {
+		if (basket.length === 1) {
+			oneTypeQuestion = true
+		}
+
+		if (classroom && oneTypeQuestion) {
 			showExemple = true
 			generateExemple()
 		}
-
 		info('Begining test with questions :', cards)
 		if (flash) {
 			beginTest()
@@ -241,7 +245,12 @@
 				if (time === 0) time = 1
 				card.time = time
 
-				delay = card.delay || card.defaultDelay || 20
+				if (classroom && oneTypeQuestion) {
+					// la durée reste la même tout au long
+					delay = delay || card.delay || card.defaultDelay || 20
+				} else {
+					delay = card.delay || card.defaultDelay || 20
+				}
 				percentage = 0
 				alert = false
 				start = Date.now()
@@ -420,19 +429,22 @@
 			{#if !flash}
 				<div class={' my-1 flex items-center justify-start'}>
 					{#if classroom}
-						<div class="flex">
-							<button
-								class="btn-icon variant-filled-tertiary mx-2"
-								on:click={() => {
-									if (delay > 5) changeDelay(delay - 5)
-								}}>-5s</button
-							>
-							<button
-								class="btn-icon variant-filled-tertiary mx-2"
-								on:click={() => {
-									if (delay <= 55) changeDelay(delay + 5)
-								}}>+5s</button
-							>
+						<div class="flex flex-col items-center gap-2">
+							<span class="text-sm">{delay} s</span>
+							<div class="flex">
+								<button
+									class="btn-icon variant-filled-tertiary mx-2"
+									on:click={() => {
+										if (delay > 5) changeDelay(delay - 5)
+									}}>-5s</button
+								>
+								<button
+									class="btn-icon variant-filled-tertiary mx-2"
+									on:click={() => {
+										if (delay <= 55) changeDelay(delay + 5)
+									}}>+5s</button
+								>
+							</div>
 						</div>
 					{/if}
 					{#if !classroom && !$touchDevice && card.type !== 'choice' && card.type !== 'choices'}
