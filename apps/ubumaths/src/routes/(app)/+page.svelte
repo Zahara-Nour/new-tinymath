@@ -1,12 +1,13 @@
 <script>
 </script>
 
-<div class="pa-12 anchor flex justify-center text-2xl">
-	<a target="_blank" href="https://math6.aefe.fr/"
-		>As-tu bien retenu les mathématiques de l'année dernière ?</a
+<div class="pa-12 flex justify-center text-3xl">4eme B</div>
+<div class="pa-12 anchor flex justify-center text-3xl">
+	<a target="_blank" href="https://math4.aefe.fr/account/register_student"
+		>As-tu bien retenu les mathématiques de l'année dernière ? CLique ici.</a
 	>
 </div>
-<div class="pa-12 flex justify-center text-2xl">Le code est : 60107e93</div>
+<div class="pa-12 flex justify-center text-3xl">Le code est : a2d770d1</div>
 <div
 	class="container mx-auto flex h-full flex-col items-center justify-center space-y-20 p-4 text-center"
 >
