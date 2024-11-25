@@ -8818,7 +8818,7 @@ const questions: Questions = {
 						],
 					],
 
-					defaultDelay: 12000,
+					defaultDelay: 25,
 					grade: SIXIEME,
 					help: `<section>
           <h3 class="${get(color2)}-text">Compléter une égalité de fractions</h3>
