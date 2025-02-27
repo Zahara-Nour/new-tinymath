@@ -191,6 +191,7 @@ export const words = [
 	'prisme',
 	'probabilite',
 	'produit',
+	'probleme',
 	'proportionnalite',
 	'propriete',
 	'puissance',
