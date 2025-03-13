@@ -27,7 +27,7 @@
 	const today = DateTime.now()
 	const term1Start = DateTime.fromISO('2024-09-01')
 	const term2Start = DateTime.fromISO('2024-12-15')
-	const term3Start = DateTime.fromISO('2025-03-15')
+	const term3Start = DateTime.fromISO('2025-03-09')
 	const yearEnd = DateTime.fromISO('2025-07-01')
 
 	async function getWarnings() {

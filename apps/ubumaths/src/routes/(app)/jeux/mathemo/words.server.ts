@@ -98,6 +98,8 @@ export const words = [
 	'evenement',
 	'exponentielle',
 	'extremite',
+	'euclide',
+	'euclidienne',
 	'face',
 	'facteur',
 	'factorisation',
