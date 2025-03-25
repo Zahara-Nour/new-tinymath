@@ -126,6 +126,12 @@ const cardPool: VipCard[] = [
 		text: 'Je choisis ma place pour une semaine (mais mon professeur peut me remettre à mon ancienne pace si je ne suis pas sérieux)',
 		rarity: 'rare',
 	},
+	{
+		name: 'alchimie',
+		title: 'Alchime',
+		text: 'Je transforme 3 de mes cartes VIP en une carte "Point Bonus"',
+		rarity: 'rare',
+	},
 
 	{
 		name: 'soldes',

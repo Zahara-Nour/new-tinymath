@@ -185,6 +185,7 @@ export const words = [
 	'perimetre',
 	'permutation',
 	'perpendiculaire',
+	'pi',
 	'plan',
 	'plus',
 	'point',
