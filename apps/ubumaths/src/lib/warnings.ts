@@ -10,6 +10,7 @@ export const warningCasesShort = [
 	'Triche',
 	'Absent',
 	'Projectile',
+	'Règles de vie de classe',
 ]
 
 export const warningCases: Record<string, Record<string, string>> = {
@@ -20,12 +21,15 @@ export const warningCases: Record<string, Record<string, string>> = {
 		Déplacement: 'Se déplace en classe sans en avoir eu la permission',
 		'Prise de parole': "Prends la parole sans en avoir eu l'autorisation",
 		Dort: 'Dort sur sa table',
-		'Refus de travail': 'Ne fait pas le travail demandé',
+		'Refus de travail':
+			'Ne fait pas le travail demandé / range ses affaires avant la fin du cours / dort en classe',
 		Bavarde: "Bavarde ou s'amuse au lieu d'écouter ou de travailler",
 		Triche: "Triche pendant l'évaluation",
 		Absent: 'Absent',
 		Projectile: 'Lance un objet à travers la classe',
 		Exclusion: 'Exclus de cours',
+		'Règles de vie de classe':
+			"Chewing-gum / déplacement non autorisé / Bavardages / Téléphone / Prise de parole on autorisée / jet d'objet",
 	},
 	ar: {
 		Retard: 'تأخر عن حصة الرياضيات',
@@ -40,6 +44,7 @@ export const warningCases: Record<string, Record<string, string>> = {
 		Absent: 'غياب',
 		Projectile: 'رمى شيء عبر الغرفة',
 		Exclusion: 'Exclus de cours',
+		'Règles de vie de classe': '',
 	},
 	en: {
 		Retard: 'Arrives late to class',
@@ -54,5 +59,6 @@ export const warningCases: Record<string, Record<string, string>> = {
 		Absent: 'Absent',
 		Projectile: 'Throws an object across the classroom',
 		Exclusion: 'Excluded from class',
+		'Règles de vie de classe': '',
 	},
 }

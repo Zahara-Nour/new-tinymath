@@ -1,7 +1,6 @@
 <script>
 </script>
 
-<div class="pa-12 flex justify-center text-3xl">Le code est : a2d770d1</div>
 <div
 	class="container mx-auto flex h-full flex-col items-center justify-center space-y-20 p-4 text-center"
 >
