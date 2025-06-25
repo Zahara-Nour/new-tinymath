@@ -14,6 +14,7 @@ const links: Links = [
 	},
 	{ text: 'Jeux', url: '/jeux', tooltip: 'Jeux mathématiques' },
 	{ text: 'Club Info', url: '/club-info', tooltip: 'Club informatique' },
+	{ text: 'Cours', url: '/cours', tooltip: 'Cours de M. Le Jolly' },
 	// {text:'Navadra', url:'/navadra', tooltip:''},
 ]
 
