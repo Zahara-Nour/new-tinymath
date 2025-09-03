@@ -143,7 +143,7 @@
 				<span class="flex-auto"
 					>S'entrainer au <span class="emphase">calcul mental</span>, par exemple sur le site de M.
 					Le Jolly,
-					<a class="anchor" target="_blank" href="https://www.ubumaths.net/automaths">Ubumaths</a
+					<a class="anchor" target="_blank" href="https://www.ubumaths.fr/automaths">Ubumaths</a
 					>.</span
 				>
 			</li>
