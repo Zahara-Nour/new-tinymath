@@ -9,12 +9,12 @@ const cardPool: VipCard[] = [
 		text: "Je peux assister le professeur pour un tour de mathémagie, ou le professeur peut m'apprendre un tour de mathémagie pour épater mes amis.",
 		rarity: 'common',
 	},
-	{
-		name: 'captain',
-		title: 'Captain',
-		text: "Je peux choisir mon rôle lors d'un travail de groupe.",
-		rarity: 'common',
-	},
+	// {
+	// 	name: 'captain',
+	// 	title: 'Captain',
+	// 	text: "Je peux choisir mon rôle lors d'un travail de groupe.",
+	// 	rarity: 'common',
+	// },
 	{
 		name: 'lalala',
 		title: 'La la la la la',
@@ -30,14 +30,7 @@ const cardPool: VipCard[] = [
 	{
 		name: 'jeu',
 		title: 'Jeu maths',
-		text: "Je peux choisir le jeu mathématique que l'on va faire.",
-		rarity: 'common',
-	},
-
-	{
-		name: 'fame',
-		title: 'Walk of fame',
-		text: "J'ai le droit à mon moment de gloire : je peux afficher une œuvre personnelle dans la classe, raconter une blague à la classe, .....bref, tout ce qui peut me mettre en  valeur aux yeux de la classe..",
+		text: "Je peux choisir le jeu mathématique que l'on va faire, et j'ai droit à des avantages sur le jeu choisi.",
 		rarity: 'common',
 	},
 	{
@@ -75,42 +68,36 @@ const cardPool: VipCard[] = [
 		text: "J'ai le droit d'utiliser mes cahiers pendant une évaluation.",
 		rarity: 'uncommon',
 	},
-	{
-		name: 'team',
-		title: 'My team',
-		text: 'Je peux choisir le groupe avec lequel il faudra produire un travail.',
-		rarity: 'uncommon',
-	},
+	// {
+	// 	name: 'team',
+	// 	title: 'My team',
+	// 	text: 'Je peux choisir le groupe avec lequel il faudra produire un travail.',
+	// 	rarity: 'uncommon',
+	// },
 	{
 		name: 'help',
 		title: 'Help !',
 		text: "J'ai le droit à une aide particulière du professeur pendant mon évaluation.",
 		rarity: 'uncommon',
 	},
-	{
-		name: 'inventeur',
-		title: 'Inventeur',
-		text: "Je peux proposer l'idée d'une nouvelle carte VIP ( qui devra être validée par le professeur).",
-		rarity: 'uncommon',
-	},
 
-	{
-		name: 'coup-double',
-		title: 'Coup double',
-		text: 'Je choisis pour ce trimestre une note qui va compter deux fois.',
-		rarity: 'rare',
-	},
 	{
 		name: 'throne',
 		title: 'Game of throne',
 		text: "J'ai le droit d'avoir la chaise du prof pour une heure.",
-		rarity: 'rare',
+		rarity: 'uncommon',
 	},
 
 	{
 		name: 'super-bonus',
 		title: 'Super bonus',
 		text: 'Je peux ajouter deux points sur mes évaluations.',
+		rarity: 'rare',
+	},
+	{
+		name: 'inventeur',
+		title: 'Inventeur',
+		text: "Je peux proposer l'idée d'une nouvelle carte VIP ( qui devra être validée par le professeur).",
 		rarity: 'rare',
 	},
 
@@ -165,16 +152,28 @@ const cardPool: VipCard[] = [
 			param: 3,
 		},
 	},
-	{
-		name: 'candy',
-		title: 'Candy',
-		text: "Si mes parents sont d'accord, j'ai le droit à ce que le professeur m'offre un paquet de bonbons.",
-		rarity: 'legendary',
-	},
+	// {
+	// 	name: 'candy',
+	// 	title: 'Candy',
+	// 	text: "Si mes parents sont d'accord, j'ai le droit à ce que le professeur m'offre un paquet de bonbons.",
+	// 	rarity: 'legendary',
+	// },
 	{
 		name: 'fortune',
 		title: 'Roue de la fortune',
 		text: 'Tu peux retirer autant de cartes que tu as pour les remplacer par de nouvelles.',
+		rarity: 'legendary',
+	},
+	{
+		name: 'coup-double',
+		title: 'Coup double',
+		text: 'Je choisis pour ce trimestre une note qui va compter deux fois.',
+		rarity: 'legendary',
+	},
+	{
+		name: 'fame',
+		title: 'Walk of fame',
+		text: "J'ai le droit à mon moment de gloire : je peux afficher une œuvre personnelle dans la classe, raconter une blague à la classe, .....bref, tout ce qui peut me mettre en  valeur aux yeux de la classe. Je peux aussi choisir pour que l'on fasse un article sur moi à mettre sur le site du lycée. Cela me donne droit également à deux points bonus",
 		rarity: 'legendary',
 	},
 ]
